@@ -42,7 +42,7 @@ export const membershipRepository = {
 
   async findActiveByProfile(profileId: string): Promise<MembershipDocument[]> {
     return MembershipModel.find({ profileId, status: "active" })
-      .populate("userId", "displayName email photoUrl")
+      .populate("userId", "name email avatarUrl")
       .sort({ joinedAt: 1 })
       .exec();
   },

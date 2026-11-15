@@ -91,3 +91,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `npm run typecheck -w apps/api` exit 0; `vitest run --no-coverage tests/care-models-and-repos.test.ts tests/access-middleware.test.ts` 15 passed; all models, indexes, and repositories verified.
+
+## Phase 2–5 — Step 2: Profiles, join, members, sharing toggles, cascade delete
+
+- Status: PASS
+- Evidence: `vitest run --no-coverage apps/api/tests/profile-endpoints.test.ts` 10 passed (create 201, IDOR 404, join lockout on 5 fails, join 200 viewer, role promotion/demotion guards, sharing update, passcode rotation, cascade delete).
