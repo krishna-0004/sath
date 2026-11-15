@@ -4,6 +4,10 @@ import { requireAuthMiddleware } from "../middleware/require-auth.js";
 import { requireProfileMember } from "../middleware/require-profile-member.js";
 import { requireProfileRole } from "../middleware/require-profile-role.js";
 import { validate } from "../middleware/validate.js";
+import { medicineRouter } from "./medicine.routes.js";
+import { doseRouter } from "./dose.routes.js";
+import { appointmentRouter } from "./appointment.routes.js";
+import { doctorContactRouter } from "./doctor-contact.routes.js";
 import {
   createProfileSchema,
   joinProfileSchema,
@@ -68,6 +72,12 @@ export function createProfileRouter(): Router {
     profileController.updateMemberRole,
   );
   router.delete("/:id/members/:userId", requireProfileMember, profileController.removeMember);
+
+  // Sub-resources mounted with requireProfileMember
+  router.use("/:id/medicines", requireProfileMember, medicineRouter);
+  router.use("/:id/doses", requireProfileMember, doseRouter);
+  router.use("/:id/appointments", requireProfileMember, appointmentRouter);
+  router.use("/:id/doctor-contacts", requireProfileMember, doctorContactRouter);
 
   return router;
 }

@@ -96,3 +96,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `vitest run --no-coverage apps/api/tests/profile-endpoints.test.ts` 10 passed (create 201, IDOR 404, join lockout on 5 fails, join 200 viewer, role promotion/demotion guards, sharing update, passcode rotation, cascade delete).
+
+## Phase 2–5 — Step 3: Medicines, doses, appointments, doctor contacts
+
+- Status: PASS
+- Evidence: `vitest run --no-coverage apps/api/tests/care-operations.test.ts` 9 passed (medicines CRUD & stop, category sharing enforcement, today doses lazy generation in local timezone with displayStatus, dose recording with audit, 7-day adherence summary, appointments CRUD, elder-only doctor contacts with consent recording & revoke).
