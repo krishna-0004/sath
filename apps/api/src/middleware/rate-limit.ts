@@ -37,6 +37,24 @@ export const globalLimiter = createRateLimiter({
 });
 
 /**
+ * Auth rate limiter for login and demo endpoints: 20 requests per 15 minutes per IP.
+ */
+export const authLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: "Too many authentication requests. Please try again later.",
+});
+
+/**
+ * Refresh rate limiter: 60 requests per 15 minutes per IP.
+ */
+export const refreshLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: "Too many token refresh requests. Please try again later.",
+});
+
+/**
  * Strict rate limiter for sensitive endpoints: 10 requests per 15 minutes per IP.
  */
 export const strictLimiter = createRateLimiter({

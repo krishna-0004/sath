@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
 import { env } from "./config/env.js";
 import { corsMiddleware } from "./middleware/cors.js";
+import { csrfGuardMiddleware } from "./middleware/csrf-guard.js";
 import { errorHandlerMiddleware } from "./middleware/error-handler.js";
 import { httpLoggerMiddleware } from "./middleware/http-logger.js";
 import { noSqlInjectionMiddleware } from "./middleware/no-sql-injection.js";
@@ -57,7 +58,10 @@ export function createApp(options: AppOptions = {}): Express {
   // 9. Global Rate Limiter
   app.use(globalLimiter);
 
-  // 10. Mount API Routes under /api
+  // 10. CSRF Protection for unsafe methods on /api
+  app.use("/api", csrfGuardMiddleware);
+
+  // 11. Mount API Routes under /api
   app.use("/api", createApiRouter(options));
 
   // 11. 404 Handler

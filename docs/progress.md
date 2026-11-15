@@ -66,3 +66,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: Unit & stub tests passed in `tests/google-oauth.test.ts` (8 passed). Live curl against running server `GET /api/auth/google` returned 302 to https://accounts.google.com/ with client_id, state, openid email profile scopes, no access_type/token, and signed HttpOnly SameSite=Lax saath_oauth cookie. Full API suite 72 passed, 93.81% coverage.
+
+## Phase 1 — Step 6: Auth middleware, /me, logout, refresh, demo, limiter
+
+- Status: PASS
+- Evidence: `vitest run tests/auth-endpoints.test.ts` 8 passed. Full API suite 80 passed (coverage 92.82%). Real live curls confirmed CSRF rejection without `X-Saath-CSRF: 1` (403), demo login setting `saath_at` & `saath_rt` cookies (204), `GET /api/auth/me` (200), `POST /api/auth/refresh` rotating tokens & reuse detection after leeway (401 REFRESH_REUSED with family revoked), idempotent logout (204), demo 404 when disabled, and rate limiter 429 on attempt 21 with standard envelope and Retry-After.
