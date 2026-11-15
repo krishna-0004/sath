@@ -9,31 +9,60 @@ const currentDir = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(currentDir, "../../.env") });
 dotenv.config({ path: path.resolve(currentDir, "../../../.env") });
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  PORT: z.coerce.number().int().positive().default(4000),
-  LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error", "fatal"]).default("info"),
-  MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
-  CLIENT_ORIGIN: z.string().min(1, "CLIENT_ORIGIN is required"),
-  AI_SERVICE_URL: z.string().url("AI_SERVICE_URL must be a valid URL"),
-  AI_SERVICE_TOKEN: z
-    .string()
-    .min(32, "AI_SERVICE_TOKEN must be at least 32 characters long for security"),
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    PORT: z.coerce.number().int().positive().default(4000),
+    LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error", "fatal"]).default("info"),
+    MONGODB_URI: z
+      .string({ required_error: "MONGODB_URI is required" })
+      .min(1, "MONGODB_URI is required"),
+    CLIENT_ORIGIN: z
+      .string({ required_error: "CLIENT_ORIGIN is required" })
+      .min(1, "CLIENT_ORIGIN is required"),
+    AI_SERVICE_URL: z
+      .string({ required_error: "AI_SERVICE_URL is required" })
+      .url("AI_SERVICE_URL must be a valid URL"),
+    AI_SERVICE_TOKEN: z
+      .string({ required_error: "AI_SERVICE_TOKEN is required" })
+      .min(32, "AI_SERVICE_TOKEN must be at least 32 characters long for security"),
 
-  // Future phase optional vars
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_REDIRECT_URI: z.string().url().optional(),
-  JWT_ACCESS_SECRET: z.string().min(32).optional(),
-  JWT_REFRESH_SECRET: z.string().min(32).optional(),
-  CLOUDINARY_CLOUD_NAME: z.string().optional(),
-  CLOUDINARY_API_KEY: z.string().optional(),
-  CLOUDINARY_API_SECRET: z.string().optional(),
-  GMAIL_CLIENT_EMAIL: z.string().email().optional(),
-  GMAIL_PRIVATE_KEY: z.string().optional(),
-  ELEVENLABS_API_KEY: z.string().optional(),
-  TICK_SECRET: z.string().min(32).optional(),
-});
+    // Phase 1 Authentication
+    GOOGLE_CLIENT_ID: z
+      .string({ required_error: "GOOGLE_CLIENT_ID is required" })
+      .min(1, "GOOGLE_CLIENT_ID is required"),
+    GOOGLE_CLIENT_SECRET: z
+      .string({ required_error: "GOOGLE_CLIENT_SECRET is required" })
+      .min(1, "GOOGLE_CLIENT_SECRET is required"),
+    GOOGLE_CALLBACK_URL: z
+      .string({ required_error: "GOOGLE_CALLBACK_URL is required" })
+      .url("GOOGLE_CALLBACK_URL must be a valid URL"),
+    JWT_ACCESS_SECRET: z
+      .string({ required_error: "JWT_ACCESS_SECRET is required" })
+      .min(32, "JWT_ACCESS_SECRET must be at least 32 characters long"),
+    COOKIE_SECRET: z
+      .string({ required_error: "COOKIE_SECRET is required" })
+      .min(32, "COOKIE_SECRET must be at least 32 characters long"),
+    ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(900),
+    REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(7),
+    REFRESH_REUSE_LEEWAY_SECONDS: z.coerce.number().int().nonnegative().default(10),
+    DEMO_LOGIN_ENABLED: z
+      .preprocess((val) => val === true || val === "true", z.boolean())
+      .default(false),
+
+    // Future phase optional vars
+    CLOUDINARY_CLOUD_NAME: z.string().optional(),
+    CLOUDINARY_API_KEY: z.string().optional(),
+    CLOUDINARY_API_SECRET: z.string().optional(),
+    GMAIL_CLIENT_EMAIL: z.string().email().optional(),
+    GMAIL_PRIVATE_KEY: z.string().optional(),
+    ELEVENLABS_API_KEY: z.string().optional(),
+    TICK_SECRET: z.string().min(32).optional(),
+  })
+  .refine((data) => data.COOKIE_SECRET !== data.JWT_ACCESS_SECRET, {
+    message: "COOKIE_SECRET must not equal JWT_ACCESS_SECRET",
+    path: ["COOKIE_SECRET"],
+  });
 
 export type Env = z.infer<typeof envSchema>;
 

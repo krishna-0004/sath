@@ -12,6 +12,54 @@ export class UnauthenticatedError extends AppError {
   }
 }
 
+export class TokenExpiredError extends AppError {
+  constructor(message = "Access token expired") {
+    super("TOKEN_EXPIRED", message, 401);
+  }
+}
+
+export class RefreshInvalidError extends AppError {
+  constructor(message = "Invalid or expired session token") {
+    super("REFRESH_INVALID", message, 401);
+  }
+}
+
+export class RefreshReusedError extends AppError {
+  constructor(message = "Session revoked due to token reuse") {
+    super("REFRESH_REUSED", message, 401);
+  }
+}
+
+export class RefreshRaceError extends AppError {
+  constructor(message = "Concurrent token rotation detected. Please retry.") {
+    super("REFRESH_RACE", message, 409);
+  }
+}
+
+export class CsrfRejectedError extends AppError {
+  constructor(message = "Cross-site request forgery check failed") {
+    super("CSRF_REJECTED", message, 403);
+  }
+}
+
+export class OAuthFailedError extends AppError {
+  constructor(message = "Authentication provider sign-in failed") {
+    super("OAUTH_FAILED", message, 400);
+  }
+}
+
+export class OAuthStateMismatchError extends AppError {
+  constructor(message = "Authentication state mismatch or expired") {
+    super("OAUTH_STATE_MISMATCH", message, 400);
+  }
+}
+
+export class AccountDisabledError extends AppError {
+  constructor(message = "This account is disabled. Please contact support.") {
+    super("ACCOUNT_DISABLED", message, 403);
+  }
+}
+
 export class ForbiddenError extends AppError {
   constructor(message = "Access forbidden") {
     super("FORBIDDEN", message, 403);

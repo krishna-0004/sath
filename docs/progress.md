@@ -34,11 +34,6 @@ This log tracks verification protocol execution step-by-step.
 
 ## Phase 0 — Step 7: UI proof
 
-## Phase 0 — Step 7: UI proof
-
-- Status: PASS
-- Evidence: Playwright browser verification passed with 0 console errors, 0 failed network requests, Skip to content link functional, landmarks present (<header>, <main id="main">, <footer>), primary touch targets >= 76px confirmed.
-
 - Status: PASS
 - Evidence: Playwright browser verification passed with 0 console errors, 0 failed network requests, Skip to content link functional, landmarks present (<header>, <main id="main">, <footer>), primary touch targets >= 76px confirmed.
 
@@ -47,7 +42,7 @@ This log tracks verification protocol execution step-by-step.
 - Status: PASS
 - Evidence: 0 occurrences of `: any` / `as any` across TS code, 0 `console.log` statements in API/Web, 0 `localStorage`/`sessionStorage` in Web, 0 `print(` in AI Python code, 0 `TODO`/`FIXME` in code.
 
-## Phase 0 — Step 8: Codebase hygiene check
+## Phase 1 — Step 1: Dependencies, env and config
 
 - Status: PASS
-- Evidence: 0 occurrences of `: any` / `as any` across TS code, 0 `console.log` statements in API/Web, 0 `localStorage`/`sessionStorage` in Web, 0 `print(` in AI Python code, 0 `TODO`/`FIXME` in code.
+- Evidence: `npm run typecheck -w apps/api` exit 0; `vitest run tests/env.test.ts` 3 passed (valid env parses, missing secrets fail with readable list, COOKIE_SECRET == JWT_ACCESS_SECRET fails). Full API suite 40 passed, 93.04% coverage.
