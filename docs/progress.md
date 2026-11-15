@@ -56,3 +56,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `vitest run tests/tokens-and-cookies.test.ts` 11 passed (sign+verify OK, expired -> TOKEN_EXPIRED, tampered signature / wrong audience / wrong issuer / alg:none -> UNAUTHENTICATED, cookie flags match spec, clear cookies path parity). Full API suite 57 passed, 94.61% coverage.
+
+## Phase 1 — Step 4: Refresh rotation, reuse detection, logout
+
+- Status: PASS
+- Evidence: `vitest run tests/session.service.test.ts` 9 passed (happy rotation, reuse within leeway -> REFRESH_RACE with family intact, reuse after leeway -> REFRESH_REUSED with family revoked, expired token, disabled user, concurrent 5x rotation -> 1 success 4 race, idempotent logout, logoutAll, zero plaintext tokens in DB). Full API suite 66 passed, 94.64% coverage.
