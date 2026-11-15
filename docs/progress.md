@@ -46,3 +46,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `npm run typecheck -w apps/api` exit 0; `vitest run tests/env.test.ts` 3 passed (valid env parses, missing secrets fail with readable list, COOKIE_SECRET == JWT_ACCESS_SECRET fails). Full API suite 40 passed, 93.04% coverage.
+
+## Phase 1 — Step 2: Data layer
+
+- Status: PASS
+- Evidence: `vitest run tests/repositories.test.ts` 6 passed (user upsert idempotent, duplicate email throws ConflictError, RefreshToken TTL index verified, AuditEvent strictly exposes ONLY create). Full API suite 46 passed, 94.83% coverage.
