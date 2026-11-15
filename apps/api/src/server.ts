@@ -14,10 +14,10 @@ const app = createApp();
 let server: Server | undefined;
 
 async function startServer(): Promise<void> {
-  server = app.listen(env.PORT, () => {
+  server = app.listen(env.PORT, "0.0.0.0", () => {
     logger.info(
       { port: env.PORT, nodeEnv: env.NODE_ENV },
-      `Saath API server listening on http://localhost:${env.PORT}`,
+      `Saath API server listening on http://0.0.0.0:${env.PORT}`,
     );
   });
 
