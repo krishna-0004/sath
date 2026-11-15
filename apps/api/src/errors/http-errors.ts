@@ -107,3 +107,43 @@ export class ServiceUnavailableError extends AppError {
     super("SERVICE_UNAVAILABLE", message, 503);
   }
 }
+
+export class JoinInvalidError extends AppError {
+  constructor(message = "Invalid join code or passcode") {
+    super("JOIN_INVALID", message, 401);
+  }
+}
+
+export class JoinLockedError extends AppError {
+  constructor(message = "Too many failed join attempts. Please try again in 15 minutes.") {
+    super("JOIN_LOCKED", message, 429);
+  }
+}
+
+export class FileTooLargeError extends AppError {
+  constructor(message = "File exceeds maximum upload size") {
+    super("FILE_TOO_LARGE", message, 413);
+  }
+}
+
+export class UnsupportedFileError extends AppError {
+  constructor(message = "Unsupported file type") {
+    super("UNSUPPORTED_FILE", message, 415);
+  }
+}
+
+export class AiUnavailableError extends AppError {
+  constructor(
+    message = "AI care analysis service is currently unavailable. You can enter details manually.",
+  ) {
+    super("AI_UNAVAILABLE", message, 502);
+  }
+}
+
+export class AiBadOutputError extends AppError {
+  constructor(
+    message = "AI response did not meet safety guidelines. Defaulting to standard template.",
+  ) {
+    super("AI_BAD_OUTPUT", message, 502);
+  }
+}

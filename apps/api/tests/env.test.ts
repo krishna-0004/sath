@@ -3,7 +3,7 @@ import { validateEnv } from "../src/config/env.js";
 
 describe("Environment Configuration Validator", () => {
   const baseValidConfig = {
-    NODE_ENV: "production",
+    NODE_ENV: "development",
     PORT: "5000",
     LOG_LEVEL: "debug",
     MONGODB_URI: "mongodb://localhost:27017/saath_test",
@@ -19,12 +19,44 @@ describe("Environment Configuration Validator", () => {
 
   it("successfully parses valid environment variables", () => {
     const parsed = validateEnv(baseValidConfig);
-    expect(parsed.NODE_ENV).toBe("production");
+    expect(parsed.NODE_ENV).toBe("development");
     expect(parsed.PORT).toBe(5000);
     expect(parsed.ACCESS_TOKEN_TTL_SECONDS).toBe(900);
     expect(parsed.REFRESH_TOKEN_TTL_DAYS).toBe(7);
     expect(parsed.REFRESH_REUSE_LEEWAY_SECONDS).toBe(10);
     expect(parsed.DEMO_LOGIN_ENABLED).toBe(false);
+    expect(parsed.EMAIL_PROVIDER).toBe("log");
+    expect(parsed.AI_REQUEST_TIMEOUT_MS).toBe(60000);
+    expect(parsed.SHARE_LINK_TTL_HOURS).toBe(24);
+  });
+
+  it("refuses EMAIL_PROVIDER='log' when NODE_ENV='production'", () => {
+    expect(() =>
+      validateEnv({
+        ...baseValidConfig,
+        NODE_ENV: "production",
+        EMAIL_PROVIDER: "log",
+      }),
+    ).toThrowError(/EMAIL_PROVIDER='log' is refused when NODE_ENV=production/);
+  });
+
+  it("requires GMAIL_SENDER and GMAIL_REFRESH_TOKEN when EMAIL_PROVIDER='gmail'", () => {
+    expect(() =>
+      validateEnv({
+        ...baseValidConfig,
+        EMAIL_PROVIDER: "gmail",
+      }),
+    ).toThrowError(/GMAIL_SENDER and GMAIL_REFRESH_TOKEN are required when EMAIL_PROVIDER=gmail/);
+
+    const validGmailConfig = validateEnv({
+      ...baseValidConfig,
+      NODE_ENV: "production",
+      EMAIL_PROVIDER: "gmail",
+      GMAIL_SENDER: "alerts@saath.invalid",
+      GMAIL_REFRESH_TOKEN: "valid-refresh-token",
+    });
+    expect(validGmailConfig.EMAIL_PROVIDER).toBe("gmail");
+    expect(validGmailConfig.GMAIL_SENDER).toBe("alerts@saath.invalid");
   });
 
   it("fails with a readable list of errors when secrets and required fields are missing", () => {

@@ -1,8 +1,38 @@
 import { Document, Schema, Types, model } from "mongoose";
 
+export type AuditAction =
+  | "auth.login_success"
+  | "auth.login_failed"
+  | "auth.logout"
+  | "auth.logout_all"
+  | "auth.token_refresh_success"
+  | "auth.token_refresh_reuse"
+  | "auth.token_refresh_race"
+  | "auth.csrf_violation"
+  | "auth.account_disabled"
+  | "profile.created"
+  | "member.joined"
+  | "member.role_changed"
+  | "member.removed"
+  | "sharing.changed"
+  | "passcode.rotated"
+  | "medicine.created"
+  | "medicine.updated"
+  | "medicine.stopped"
+  | "dose.recorded"
+  | "report.confirmed"
+  | "report.deleted"
+  | "sos.triggered"
+  | "sos.email_sent"
+  | "sos.email_failed"
+  | "share.created"
+  | "share.viewed"
+  | "share.revoked"
+  | "data.deleted";
+
 export interface AuditEventDocument extends Document {
   actorUserId: Types.ObjectId | string | null;
-  action: string;
+  action: AuditAction | string;
   outcome: "success" | "failure";
   metadata: Record<string, unknown>;
   requestId: string | null;

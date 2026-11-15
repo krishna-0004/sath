@@ -50,19 +50,44 @@ const envSchema = z
       .preprocess((val) => val === true || val === "true", z.boolean())
       .default(false),
 
-    // Future phase optional vars
+    // Phases 2–5 Care Core, Documents, SOS, Email
     CLOUDINARY_CLOUD_NAME: z.string().optional(),
     CLOUDINARY_API_KEY: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().optional(),
-    GMAIL_CLIENT_EMAIL: z.string().email().optional(),
-    GMAIL_PRIVATE_KEY: z.string().optional(),
-    ELEVENLABS_API_KEY: z.string().optional(),
-    TICK_SECRET: z.string().min(32).optional(),
+    AI_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(60000),
+    EMAIL_PROVIDER: z.enum(["gmail", "log"]).default("log"),
+    GMAIL_SENDER: z.string().optional(),
+    GMAIL_REFRESH_TOKEN: z.string().optional(),
+    SHARE_LINK_TTL_HOURS: z.coerce.number().int().positive().default(24),
   })
   .refine((data) => data.COOKIE_SECRET !== data.JWT_ACCESS_SECRET, {
     message: "COOKIE_SECRET must not equal JWT_ACCESS_SECRET",
     path: ["COOKIE_SECRET"],
-  });
+  })
+  .refine(
+    (data) => {
+      if (data.NODE_ENV === "production" && data.EMAIL_PROVIDER === "log") {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "EMAIL_PROVIDER='log' is refused when NODE_ENV=production",
+      path: ["EMAIL_PROVIDER"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.EMAIL_PROVIDER === "gmail") {
+        return Boolean(data.GMAIL_SENDER && data.GMAIL_REFRESH_TOKEN);
+      }
+      return true;
+    },
+    {
+      message: "GMAIL_SENDER and GMAIL_REFRESH_TOKEN are required when EMAIL_PROVIDER=gmail",
+      path: ["GMAIL_SENDER"],
+    },
+  );
 
 export type Env = z.infer<typeof envSchema>;
 

@@ -86,3 +86,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `npm run check` exit 0 (lint, typecheck, test, build across all apps). Coverage: web 95%, api 92.82%, ai 90.98%. Hygiene: 0 `any`, 0 `console.log`, 0 `localStorage`/`sessionStorage`, 0 `print(`, 0 `TODO`/`FIXME`. Pushed 8 commits to origin main (8f4cd61..4e28c23).
+
+## Phase 2–5 — Step 1: Env, deps, models, repositories, access middleware
+
+- Status: PASS
+- Evidence: `npm run typecheck -w apps/api` exit 0; `vitest run --no-coverage tests/care-models-and-repos.test.ts tests/access-middleware.test.ts` 15 passed; all models, indexes, and repositories verified.
