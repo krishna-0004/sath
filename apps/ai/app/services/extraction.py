@@ -84,7 +84,7 @@ class ExtractionService:
 
         try:
             response = self._client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=get_settings().GEMINI_MODEL,
                 contents=[
                     content_part,
                     "Transcribe all prescribed medicines and doctor notes verbatim.",
@@ -121,7 +121,7 @@ class ExtractionService:
 
         try:
             response = self._client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=get_settings().GEMINI_MODEL,
                 contents=[
                     content_part,
                     (

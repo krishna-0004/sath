@@ -57,7 +57,7 @@ class AudioService:
             )
 
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model=self.settings.GEMINI_MODEL,
                 contents=[
                     types.Part.from_bytes(data=audio_bytes, mime_type=payload.mime_type),
                     prompt,

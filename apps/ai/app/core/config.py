@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     AI_SERVICE_TOKEN: str = Field(default="")
     ALLOWED_ORIGINS: str = Field(default="")
     GEMINI_API_KEY: str | None = Field(default=None)
+    GEMINI_MODEL: str = Field(default="gemini-3.8-flash")
     MAX_UPLOAD_BYTES: int = Field(default=4194304)
 
     @field_validator("AI_SERVICE_TOKEN")
