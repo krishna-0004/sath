@@ -81,3 +81,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `node scratch/verify-step8-env.mjs` exit 0 (16/16 env keys in apps/api/.env.example verified across docs/deployment.md, render.yaml, and env.ts). Docs updated: docs/security.md (threat model, rotation, leeway, reuse detection, OAuth CSRF, append-only audit trail); docs/architecture.md (Mermaid sequence diagram for login/init/refresh/logout); docs/error-handling.md (8 new machine error codes in master table); docs/decisions.md (ADRs 008-011). Zero TODOs/placeholders in docs.
+
+## Phase 1 — Step 9: Full check and phase report
+
+- Status: PASS
+- Evidence: `npm run check` exit 0 (lint, typecheck, test, build across all apps). Coverage: web 95%, api 92.82%, ai 90.98%. Hygiene: 0 `any`, 0 `console.log`, 0 `localStorage`/`sessionStorage`, 0 `print(`, 0 `TODO`/`FIXME`. Pushed 8 commits to origin main (8f4cd61..4e28c23).
