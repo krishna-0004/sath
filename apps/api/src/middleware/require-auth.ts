@@ -24,3 +24,5 @@ export async function requireAuthMiddleware(
 
   next();
 }
+
+export const requireAuth = requireAuthMiddleware;

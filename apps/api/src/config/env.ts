@@ -51,6 +51,7 @@ const envSchema = z
       .default(false),
 
     // Phases 2–5 Care Core, Documents, SOS, Email
+    CLOUDINARY_URL: z.string().optional(),
     CLOUDINARY_CLOUD_NAME: z.string().optional(),
     CLOUDINARY_API_KEY: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().optional(),

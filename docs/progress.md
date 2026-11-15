@@ -106,3 +106,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `npm run typecheck -w apps/web` exit 0; `npm run lint -w apps/web` exit 0; `npm run test -w apps/web` 18 files passed (70 tests, 94.9% statement coverage); `npm run build -w apps/web` exit 0; WCAG 2.2 AA >= 76px primary buttons, aria-live receipt announcement, and axe checks passed.
+
+## Milestone 1 Checkpoint: Care Core Complete
+
+- Status: PASS
+- Evidence: Full `npm run check` passed across all workspaces (lint, typecheck, test, build). Web: 70 tests passed (94.9% coverage). API: 133 tests passed (95.02% statement, 81.65% branch coverage). AI: 16 tests passed (90.98% coverage). Build succeeded in web and api. Committed (`56e5096`) and pushed to origin/main.
