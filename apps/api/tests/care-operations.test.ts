@@ -233,6 +233,21 @@ describe("Phase 2 Care Operations - Medicines, Doses, Appointments, Contacts", (
           { _id: new mongoose.Types.ObjectId(createdMedicineId) },
           { $set: { status: "active" } },
         );
+
+      // 404 on non-existent medicine
+      const fakeId = new mongoose.Types.ObjectId().toString();
+      const notFoundPatch = await request(app)
+        .patch(`/api/profiles/${profileId}/medicines/${fakeId}`)
+        .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${editorToken}`)
+        .set("X-Saath-CSRF", "1")
+        .send({ name: "Ghost" });
+      expect(notFoundPatch.status).toBe(404);
+
+      const notFoundStop = await request(app)
+        .post(`/api/profiles/${profileId}/medicines/${fakeId}/stop`)
+        .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${editorToken}`)
+        .set("X-Saath-CSRF", "1");
+      expect(notFoundStop.status).toBe(404);
     });
   });
 
@@ -254,6 +269,15 @@ describe("Phase 2 Care Operations - Medicines, Doses, Appointments, Contacts", (
     });
 
     it("PATCH /api/profiles/:id/doses/:doseId records dose (viewer blocked)", async () => {
+      // Non-existent dose -> 404
+      const fakeDoseId = new mongoose.Types.ObjectId().toString();
+      const notFoundRes = await request(app)
+        .patch(`/api/profiles/${profileId}/doses/${fakeDoseId}`)
+        .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${editorToken}`)
+        .set("X-Saath-CSRF", "1")
+        .send({ status: "taken" });
+      expect(notFoundRes.status).toBe(404);
+
       // Viewer blocked
       const viewerRes = await request(app)
         .patch(`/api/profiles/${profileId}/doses/${createdDoseId}`)
@@ -276,7 +300,45 @@ describe("Phase 2 Care Operations - Medicines, Doses, Appointments, Contacts", (
       expect(editorRes.body.dose.recordedBy.toString()).toBe(editorId);
     });
 
-    it("GET /api/profiles/:id/doses/summary returns adherence statistics", async () => {
+    it("GET /api/profiles/:id/doses/summary returns adherence statistics across statuses", async () => {
+      // Seed a spilled dose, a skipped dose, and a past due (missed) dose to exercise branches
+      const now = new Date();
+      await mongoose.connection.collection("doseevents").insertMany([
+        {
+          profileId: new mongoose.Types.ObjectId(profileId),
+          medicineId: new mongoose.Types.ObjectId(createdMedicineId),
+          scheduledFor: new Date(now.getTime() - 1000 * 60 * 60 * 5), // 5 hours ago (missed)
+          status: "pending",
+          reasonText: "",
+          recordedBy: null,
+          recordedAt: null,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          profileId: new mongoose.Types.ObjectId(profileId),
+          medicineId: new mongoose.Types.ObjectId(createdMedicineId),
+          scheduledFor: new Date(now.getTime() - 1000 * 60 * 60 * 4),
+          status: "spilled",
+          reasonText: "dropped",
+          recordedBy: new mongoose.Types.ObjectId(editorId),
+          recordedAt: now,
+          createdAt: now,
+          updatedAt: now,
+        },
+        {
+          profileId: new mongoose.Types.ObjectId(profileId),
+          medicineId: new mongoose.Types.ObjectId(createdMedicineId),
+          scheduledFor: new Date(now.getTime() - 1000 * 60 * 60 * 3),
+          status: "skipped",
+          reasonText: "conscious skip",
+          recordedBy: new mongoose.Types.ObjectId(editorId),
+          recordedAt: now,
+          createdAt: now,
+          updatedAt: now,
+        },
+      ]);
+
       const res = await request(app)
         .get(`/api/profiles/${profileId}/doses/summary?days=7`)
         .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${elderToken}`);
@@ -285,6 +347,9 @@ describe("Phase 2 Care Operations - Medicines, Doses, Appointments, Contacts", (
       expect(res.body.summary).toBeDefined();
       expect(res.body.summary.days).toBe(7);
       expect(res.body.summary.taken).toBeGreaterThanOrEqual(1);
+      expect(res.body.summary.spilled).toBeGreaterThanOrEqual(1);
+      expect(res.body.summary.skipped).toBeGreaterThanOrEqual(1);
+      expect(res.body.summary.missed).toBeGreaterThanOrEqual(1);
       expect(res.body.summary.adherenceRate).toBeGreaterThanOrEqual(0);
     });
   });
@@ -333,6 +398,21 @@ describe("Phase 2 Care Operations - Medicines, Doses, Appointments, Contacts", (
         .set("X-Saath-CSRF", "1");
 
       expect(deleteRes.status).toBe(204);
+
+      // 404 on fake appointment
+      const fakeAptId = new mongoose.Types.ObjectId().toString();
+      const notFoundPatch = await request(app)
+        .patch(`/api/profiles/${profileId}/appointments/${fakeAptId}`)
+        .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${editorToken}`)
+        .set("X-Saath-CSRF", "1")
+        .send({ notes: "Ghost" });
+      expect(notFoundPatch.status).toBe(404);
+
+      const notFoundDelete = await request(app)
+        .delete(`/api/profiles/${profileId}/appointments/${fakeAptId}`)
+        .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${editorToken}`)
+        .set("X-Saath-CSRF", "1");
+      expect(notFoundDelete.status).toBe(404);
     });
   });
 
@@ -391,6 +471,14 @@ describe("Phase 2 Care Operations - Medicines, Doses, Appointments, Contacts", (
         .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${elderToken}`);
 
       expect(afterList.body.contacts).toHaveLength(0);
+
+      // 404 on fake contact revoke
+      const fakeContactId = new mongoose.Types.ObjectId().toString();
+      const notFoundRevoke = await request(app)
+        .delete(`/api/profiles/${profileId}/doctor-contacts/${fakeContactId}`)
+        .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${elderToken}`)
+        .set("X-Saath-CSRF", "1");
+      expect(notFoundRevoke.status).toBe(404);
     });
   });
 });

@@ -295,6 +295,42 @@ describe("Phase 2 Care Core - Profile Endpoints", () => {
       .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${tokenA}`);
 
     expect(membersAfter.body.members).toHaveLength(2);
+
+    // User C rejoins after being removed (exercises reactivation branch)
+    const rejoinC = await request(app)
+      .post("/api/profiles/join")
+      .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${tokenC}`)
+      .set("X-Saath-CSRF", "1")
+      .send({
+        joinCode: createdJoinCode,
+        passcode: "NewPass456",
+      });
+    expect(rejoinC.status).toBe(200);
+    expect(rejoinC.body.alreadyMember).toBe(false);
+
+    // Update role for non-member user -> 404
+    const fakeUserId = new mongoose.Types.ObjectId().toString();
+    const updateGhostRes = await request(app)
+      .patch(`/api/profiles/${createdProfileId}/members/${fakeUserId}`)
+      .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${tokenA}`)
+      .set("X-Saath-CSRF", "1")
+      .send({ role: "editor" });
+    expect(updateGhostRes.status).toBe(404);
+
+    // Remove non-member user -> 404
+    const removeGhostRes = await request(app)
+      .delete(`/api/profiles/${createdProfileId}/members/${fakeUserId}`)
+      .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${tokenA}`)
+      .set("X-Saath-CSRF", "1");
+    expect(removeGhostRes.status).toBe(404);
+
+    // Sharing schema empty object -> 400
+    const invalidSharing = await request(app)
+      .patch(`/api/profiles/${createdProfileId}/sharing`)
+      .set("Cookie", `${COOKIE_NAMES.ACCESS_TOKEN}=${tokenA}`)
+      .set("X-Saath-CSRF", "1")
+      .send({});
+    expect(invalidSharing.status).toBe(400);
   });
 
   it("DELETE /api/profiles/:id cascades deletion of profile and memberships", async () => {
