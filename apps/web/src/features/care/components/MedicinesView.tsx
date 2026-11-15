@@ -7,6 +7,7 @@ import { Label } from "../../../components/ui/Label.js";
 import { Modal } from "../../../components/ui/Modal.js";
 import { LoadingState } from "../../../components/ui/LoadingState.js";
 import { useCreateMedicine, useMedicines, useStopMedicine } from "../hooks/use-care-queries.js";
+import { ScanConfirmModal } from "./ScanConfirmModal.js";
 import type { MedicineAnchor, Profile } from "../types.js";
 
 export interface MedicinesViewProps {
@@ -27,6 +28,7 @@ export function MedicinesView({ profile, canEdit }: MedicinesViewProps): React.J
   const stopMutation = useStopMedicine(profile.id);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isScanOpen, setIsScanOpen] = useState(false);
   const [name, setName] = useState("");
   const [strengthText, setStrengthText] = useState("");
   const [frequencyText, setFrequencyText] = useState("");
@@ -122,14 +124,24 @@ export function MedicinesView({ profile, canEdit }: MedicinesViewProps): React.J
           </p>
         </div>
         {canEdit && (
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => setIsAddOpen(true)}
-            className="min-h-[50px] font-bold"
-          >
-            + Add Medicine
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsScanOpen(true)}
+              className="min-h-[50px] font-bold border-emerald-600 text-emerald-800 hover:bg-emerald-50"
+            >
+              Scan Prescription
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => setIsAddOpen(true)}
+              className="min-h-[50px] font-bold"
+            >
+              + Add Medicine
+            </Button>
+          </div>
         )}
       </div>
 
@@ -329,6 +341,13 @@ export function MedicinesView({ profile, canEdit }: MedicinesViewProps): React.J
           </div>
         </form>
       </Modal>
+
+      <ScanConfirmModal
+        isOpen={isScanOpen}
+        onClose={() => setIsScanOpen(false)}
+        profileId={profile.id}
+        onSuccess={() => setIsScanOpen(false)}
+      />
     </div>
   );
 }

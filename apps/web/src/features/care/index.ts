@@ -8,3 +8,4 @@ export * from "./components/FamilyDashboardView.js";
 export * from "./components/MedicinesView.js";
 export * from "./components/AppointmentsView.js";
 export * from "./components/SettingsView.js";
+export * from "./components/ScanConfirmModal.js";

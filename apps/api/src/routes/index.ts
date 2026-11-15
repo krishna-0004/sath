@@ -4,6 +4,7 @@ import { createAuthRouter } from "./auth.routes.js";
 import { healthRouter } from "./health.routes.js";
 import { profileRouter } from "./profile.routes.js";
 import { uploadRouter } from "./upload.routes.js";
+import { scanRouter } from "./scan.routes.js";
 
 export function createApiRouter(deps: AuthControllerDependencies = {}): Router {
   const router = Router();
@@ -11,6 +12,7 @@ export function createApiRouter(deps: AuthControllerDependencies = {}): Router {
   router.use("/auth", createAuthRouter(deps));
   router.use("/profiles", profileRouter);
   router.use(uploadRouter);
+  router.use(scanRouter);
   return router;
 }
 

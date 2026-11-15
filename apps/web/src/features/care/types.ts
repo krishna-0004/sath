@@ -120,3 +120,58 @@ export interface ProfileMemberItem {
   role: ProfileRole;
   joinedAt: string;
 }
+
+export interface ProposedMedicine {
+  name: string;
+  strengthText: string;
+  frequencyText: string;
+  anchors: MedicineAnchor[];
+  withFood: WithFoodTiming;
+  instructions: string;
+}
+
+export interface ProposedUpdateMedicine extends ProposedMedicine {
+  id: string;
+}
+
+export interface DiscontinuedMedicine {
+  id: string;
+  name: string;
+  strengthText: string;
+  frequencyText: string;
+  anchors: MedicineAnchor[];
+}
+
+export interface PrescriptionDiff {
+  added: ProposedMedicine[];
+  updated: ProposedUpdateMedicine[];
+  unchanged: ProposedUpdateMedicine[];
+  possiblyDiscontinued: DiscontinuedMedicine[];
+}
+
+export interface PrescriptionPreviewResponse {
+  diff: PrescriptionDiff;
+  rawDoctorNotes: string;
+  rawDateText: string | null;
+}
+
+export interface PrescriptionConfirmPayload {
+  applyAdded: ProposedMedicine[];
+  applyUpdated: ProposedUpdateMedicine[];
+  stopDiscontinuedIds: string[];
+}
+
+export interface PrescriptionConfirmResponse {
+  applied: {
+    added: number;
+    updated: number;
+    stopped: number;
+  };
+}
+
+export interface UploadAssetResponse {
+  uploadId: string;
+  privateUrl: string;
+  fileType: string;
+  bytes: number;
+}

@@ -111,3 +111,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: Full `npm run check` passed across all workspaces (lint, typecheck, test, build). Web: 70 tests passed (94.9% coverage). API: 133 tests passed (95.02% statement, 81.65% branch coverage). AI: 16 tests passed (90.98% coverage). Build succeeded in web and api. Committed (`56e5096`) and pushed to origin/main.
+
+## Phase 2–5 — Step 5: Upload and OCR extraction service (api + ai)
+
+- Status: PASS
+- Evidence: `apps/ai` pytest: 23 passed (86.54% coverage), ruff & mypy clean. `apps/api` vitest: 8 passed (upload validation, mime/size limits, private authenticated url, mock asset serving, AI 503 retry). Committed (`594317a`).

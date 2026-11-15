@@ -249,4 +249,46 @@ export const careApi = {
       method: "DELETE",
     });
   },
+
+  // Scan & Confirm
+  async uploadPrescriptionOrReport(
+    profileId: string,
+    file: File,
+  ): Promise<{ uploadId: string; privateUrl: string; fileType: string; bytes: number }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiRequest<{ uploadId: string; privateUrl: string; fileType: string; bytes: number }>(
+      `/profiles/${profileId}/uploads/prescription-or-report`,
+      {
+        method: "POST",
+        body: formData as unknown as Record<string, unknown>,
+      },
+    );
+  },
+
+  async previewPrescription(
+    profileId: string,
+    uploadId: string,
+  ): Promise<import("./types.js").PrescriptionPreviewResponse> {
+    return apiRequest<import("./types.js").PrescriptionPreviewResponse>(
+      `/profiles/${profileId}/scan/prescription/preview`,
+      {
+        method: "POST",
+        body: { uploadId },
+      },
+    );
+  },
+
+  async confirmPrescription(
+    profileId: string,
+    payload: import("./types.js").PrescriptionConfirmPayload,
+  ): Promise<import("./types.js").PrescriptionConfirmResponse> {
+    return apiRequest<import("./types.js").PrescriptionConfirmResponse>(
+      `/profiles/${profileId}/scan/prescription/confirm`,
+      {
+        method: "POST",
+        body: payload as unknown as Record<string, unknown>,
+      },
+    );
+  },
 };

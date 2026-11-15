@@ -116,8 +116,12 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
         let bodyPayload: BodyInit | undefined;
         if (options.body !== undefined) {
-          headers.set("Content-Type", "application/json");
-          bodyPayload = JSON.stringify(options.body);
+          if (typeof FormData !== "undefined" && options.body instanceof FormData) {
+            bodyPayload = options.body;
+          } else {
+            headers.set("Content-Type", "application/json");
+            bodyPayload = JSON.stringify(options.body);
+          }
         }
 
         const res = await fetch(fullUrl, {
