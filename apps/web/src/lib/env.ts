@@ -6,6 +6,7 @@ const webEnvSchema = z.object({
   PROD: z.boolean().default(false),
   DEV: z.boolean().default(true),
   VITE_DEMO_LOGIN_ENABLED: z.string().default("false"),
+  VITE_API_BASE_URL: z.string().default(""),
 });
 
 export type WebEnv = z.infer<typeof webEnvSchema>;
@@ -19,6 +20,8 @@ export function getWebEnv(): WebEnv {
     BASE_URL: import.meta.env.BASE_URL,
     PROD: import.meta.env.PROD,
     DEV: import.meta.env.DEV,
+    VITE_DEMO_LOGIN_ENABLED: import.meta.env.VITE_DEMO_LOGIN_ENABLED,
+    VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
   });
 }
 

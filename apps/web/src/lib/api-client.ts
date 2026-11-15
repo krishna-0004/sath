@@ -1,4 +1,5 @@
 import { ApiError } from "./api-error.js";
+import { env } from "./env.js";
 
 export interface RequestOptions extends Omit<RequestInit, "body"> {
   body?: unknown;
@@ -8,7 +9,8 @@ export interface RequestOptions extends Omit<RequestInit, "body"> {
 }
 
 const DEFAULT_TIMEOUT_MS = 15000;
-const BASE_PATH = "/api";
+const API_BASE_URL = (env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+const BASE_PATH = `${API_BASE_URL}/api`;
 export const AUTH_EXPIRED_EVENT = "saath:auth-expired";
 
 let inFlightRefreshPromise: Promise<void> | null = null;

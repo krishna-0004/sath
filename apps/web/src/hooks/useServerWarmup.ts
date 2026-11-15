@@ -17,46 +17,62 @@ export function useServerWarmup(): ServerWarmupState {
   const [isReady, setIsReady] = useState(false);
   const [hasFailed, setHasFailed] = useState(false);
   const timeoutTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const hardTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true);
+
+  const cleanupTimers = useCallback(() => {
+    if (timeoutTimerRef.current) clearTimeout(timeoutTimerRef.current);
+    if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
+  }, []);
 
   const checkHealth = useCallback(async (): Promise<void> => {
+    cleanupTimers();
     setIsReady(false);
     setHasFailed(false);
 
     // After 3 seconds of waiting, indicate the server is waking up
     timeoutTimerRef.current = setTimeout(() => {
-      setIsWaking(true);
+      if (isMountedRef.current) {
+        setIsWaking(true);
+      }
     }, 3000);
 
-    // Hard failure timeout after 90 seconds
-    hardTimeoutRef.current = setTimeout(() => {
-      setIsWaking(false);
-      setHasFailed(true);
-    }, 90000);
+    const startTime = Date.now();
+    const MAX_WAIT_MS = 90000;
 
-    try {
-      await apiRequest("/health", { method: "GET", timeoutMs: 90000 });
-      if (timeoutTimerRef.current) clearTimeout(timeoutTimerRef.current);
-      if (hardTimeoutRef.current) clearTimeout(hardTimeoutRef.current);
-      setIsWaking(false);
-      setIsReady(true);
-      setHasFailed(false);
-    } catch {
-      if (timeoutTimerRef.current) clearTimeout(timeoutTimerRef.current);
-      if (hardTimeoutRef.current) clearTimeout(hardTimeoutRef.current);
-      setIsWaking(false);
-      setHasFailed(true);
-    }
-  }, []);
+    const poll = async (): Promise<void> => {
+      try {
+        await apiRequest("/health", { method: "GET", timeoutMs: 10000 });
+        if (!isMountedRef.current) return;
+        cleanupTimers();
+        setIsWaking(false);
+        setIsReady(true);
+        setHasFailed(false);
+      } catch {
+        if (!isMountedRef.current) return;
+        if (Date.now() - startTime < MAX_WAIT_MS) {
+          // Keep polling every 3 seconds while server spins up
+          pollTimerRef.current = setTimeout(poll, 3000);
+        } else {
+          cleanupTimers();
+          setIsWaking(false);
+          setHasFailed(true);
+        }
+      }
+    };
+
+    void poll();
+  }, [cleanupTimers]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     void checkHealth();
 
     return () => {
-      if (timeoutTimerRef.current) clearTimeout(timeoutTimerRef.current);
-      if (hardTimeoutRef.current) clearTimeout(hardTimeoutRef.current);
+      isMountedRef.current = false;
+      cleanupTimers();
     };
-  }, [checkHealth]);
+  }, [checkHealth, cleanupTimers]);
 
   return {
     isWaking,
