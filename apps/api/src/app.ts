@@ -1,6 +1,7 @@
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import express, { type Express } from "express";
+import { env } from "./config/env.js";
 import { corsMiddleware } from "./middleware/cors.js";
 import { errorHandlerMiddleware } from "./middleware/error-handler.js";
 import { httpLoggerMiddleware } from "./middleware/http-logger.js";
@@ -53,8 +54,8 @@ export function createApp(): Express {
   // 6. JSON body parsing with strict 100kb limit
   app.use(express.json({ limit: "100kb" }));
 
-  // 7. Cookie Parser
-  app.use(cookieParser());
+  // 7. Cookie Parser with signature verification
+  app.use(cookieParser(env.COOKIE_SECRET));
 
   // 8. Rejecting NoSQL injection filter
   app.use(noSqlInjectionMiddleware);

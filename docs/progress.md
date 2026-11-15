@@ -51,3 +51,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `vitest run tests/repositories.test.ts` 6 passed (user upsert idempotent, duplicate email throws ConflictError, RefreshToken TTL index verified, AuditEvent strictly exposes ONLY create). Full API suite 46 passed, 94.83% coverage.
+
+## Phase 1 — Step 3: Token and cookie services
+
+- Status: PASS
+- Evidence: `vitest run tests/tokens-and-cookies.test.ts` 11 passed (sign+verify OK, expired -> TOKEN_EXPIRED, tampered signature / wrong audience / wrong issuer / alg:none -> UNAUTHENTICATED, cookie flags match spec, clear cookies path parity). Full API suite 57 passed, 94.61% coverage.
