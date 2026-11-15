@@ -13,6 +13,9 @@ const LoginPage = lazy(() =>
 const AppHomePage = lazy(() =>
   import("../pages/AppHomePage.js").then((m) => ({ default: m.AppHomePage })),
 );
+const ProfilePage = lazy(() =>
+  import("../pages/ProfilePage.js").then((m) => ({ default: m.ProfilePage })),
+);
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage.js").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -54,6 +57,29 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingState message="Loading..." />}>
             <NotFoundPage />
+          </Suspense>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/p/:profileId",
+    element: <ProtectedRoute />,
+    errorElement: <RouteErrorBoundary />,
+    children: [
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<LoadingState message="Loading care hub..." />}>
+            <ProfilePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "*",
+        element: (
+          <Suspense fallback={<LoadingState message="Loading care hub..." />}>
+            <ProfilePage />
           </Suspense>
         ),
       },

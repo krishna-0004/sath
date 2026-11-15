@@ -101,3 +101,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `vitest run --no-coverage apps/api/tests/care-operations.test.ts` 9 passed (medicines CRUD & stop, category sharing enforcement, today doses lazy generation in local timezone with displayStatus, dose recording with audit, 7-day adherence summary, appointments CRUD, elder-only doctor contacts with consent recording & revoke).
+
+## Phase 2–5 — Step 4: Web care core (/app, /p/:id, Today, Family Dashboard, Medicines, Appointments, Settings)
+
+- Status: PASS
+- Evidence: `npm run typecheck -w apps/web` exit 0; `npm run lint -w apps/web` exit 0; `npm run test -w apps/web` 18 files passed (70 tests, 94.9% statement coverage); `npm run build -w apps/web` exit 0; WCAG 2.2 AA >= 76px primary buttons, aria-live receipt announcement, and axe checks passed.
