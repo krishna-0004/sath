@@ -22,15 +22,24 @@ Both backend services deploy natively on Render's free tier without Docker.
 
 ### `saath-api` Environment Variables
 
-| Variable           | Value / Description                                                     | Secret? |
-| ------------------ | ----------------------------------------------------------------------- | ------- |
-| `NODE_ENV`         | `production`                                                            | No      |
-| `PORT`             | `4000`                                                                  | No      |
-| `LOG_LEVEL`        | `info`                                                                  | No      |
-| `MONGODB_URI`      | Atlas connection string                                                 | **Yes** |
-| `CLIENT_ORIGIN`    | Netlify production URL (e.g. `https://saath-care.netlify.app`)          | No      |
-| `AI_SERVICE_URL`   | Render AI internal or public URL (e.g. `https://saath-ai.onrender.com`) | No      |
-| `AI_SERVICE_TOKEN` | 32+ character random string                                             | **Yes** |
+| Variable                       | Value / Description                                            | Secret? | Generation / Origin                                            |
+| ------------------------------ | -------------------------------------------------------------- | ------- | -------------------------------------------------------------- |
+| `NODE_ENV`                     | `production`                                                   | No      | Fixed runtime mode                                             |
+| `PORT`                         | `4000`                                                         | No      | Render port                                                    |
+| `LOG_LEVEL`                    | `info`                                                         | No      | Structured logging level                                       |
+| `MONGODB_URI`                  | Atlas connection string                                        | **Yes** | MongoDB Atlas connection string                                |
+| `CLIENT_ORIGIN`                | Netlify production URL (e.g. `https://saath-care.netlify.app`) | No      | Netlify app origin                                             |
+| `AI_SERVICE_URL`               | Render AI URL (e.g. `https://saath-ai.onrender.com`)           | No      | Render internal or public URL                                  |
+| `AI_SERVICE_TOKEN`             | 32+ char token                                                 | **Yes** | `openssl rand -hex 32`                                         |
+| `GOOGLE_CLIENT_ID`             | Google OAuth Client ID                                         | **Yes** | Google Cloud Console OAuth 2.0 Web Client                      |
+| `GOOGLE_CLIENT_SECRET`         | Google OAuth Client Secret                                     | **Yes** | Google Cloud Console OAuth 2.0 Web Client                      |
+| `GOOGLE_CALLBACK_URL`          | Production redirect URI                                        | No      | e.g. `https://saath-care.netlify.app/api/auth/google/callback` |
+| `JWT_ACCESS_SECRET`            | 32+ char secret for HS256 access tokens                        | **Yes** | `openssl rand -hex 32`                                         |
+| `COOKIE_SECRET`                | 32+ char cookie signing secret (must != JWT)                   | **Yes** | `openssl rand -hex 32`                                         |
+| `ACCESS_TOKEN_TTL_SECONDS`     | Access token lifespan (default: `900`)                         | No      | Number in seconds (15 min)                                     |
+| `REFRESH_TOKEN_TTL_DAYS`       | Refresh token lifespan (default: `7`)                          | No      | Number in days (7 days)                                        |
+| `REFRESH_REUSE_LEEWAY_SECONDS` | Concurrency race leeway (default: `10`)                        | No      | Number in seconds (10s)                                        |
+| `DEMO_LOGIN_ENABLED`           | Demo account login toggle (default: `false`)                   | No      | `false` in production, `true` in dev                           |
 
 ### `saath-ai` Environment Variables
 

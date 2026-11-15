@@ -73,8 +73,56 @@ Every tier conforms to the uniform error envelope defined in `AGENTS.md`:
 - Unhandled crashes yield a generic 500 `INTERNAL_ERROR` envelope. Stack traces and raw internal error strings are never leaked to clients.
 - `X-Request-Id` is bound at the ingress point and propagated across headers, logs, and error responses.
 
-## 5. Planned Authentication & Session Model (Phase 1 Preview)
+## 5. Authentication & Session Architecture (Phase 1)
 
-- **Storage**: Tokens are never stored in `localStorage`, `sessionStorage`, or accessible JavaScript memory.
-- **Cookies**: Authentication sessions use `httpOnly`, `Secure`, `SameSite=Lax` cookies set with path `/api`.
-- **Refresh Flow**: Access token expiry (e.g., 15 minutes) triggers a transparent refresh call via an exposed hook point in `api-client.ts` (`refreshAndRetry`) using a longer-lived refresh token.
+### A. Lifecycle Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Elder / Family User
+    participant Browser as apps/web (Browser)
+    participant API as apps/api (Express 5)
+    participant Google as Google Accounts
+    participant DB as MongoDB Atlas
+
+    Note over User,Google: 1. OAuth Sign In Flow
+    User->>Browser: Clicks "Sign in with Google"
+    Browser->>API: GET /api/auth/google?returnTo=/app
+    API->>Browser: 302 Redirect to Google OAuth (sets signed saath_oauth state cookie)
+    Browser->>Google: Authenticates & grants openid, email, profile
+    Google->>API: GET /api/auth/google/callback?code=...&state=...
+    API->>Google: Exchange authorization code
+    Google-->>API: Returns user identity
+    API->>DB: Upsert User & create RefreshToken (familyId, tokenHash)
+    API->>Browser: 302 to /app with Set-Cookie: saath_at, saath_rt, clear saath_oauth
+
+    Note over Browser,DB: 2. Active Session Initialization
+    Browser->>API: GET /api/auth/me (Cookie: saath_at, X-Saath-CSRF: 1)
+    API->>DB: Lookup user by req.auth.userId
+    API-->>Browser: 200 OK { user: { name, email, ... } }
+
+    Note over Browser,DB: 3. Token Expiry & Single-Flight Refresh
+    Note over Browser: 15 minutes elapse (access token expires)
+    Browser->>API: GET /api/medications (Cookie: expired saath_at)
+    API-->>Browser: 401 Unauthorized { error: { code: "TOKEN_EXPIRED" } }
+    Note over Browser: api-client pauses and initiates single-flight refresh
+    Browser->>API: POST /api/auth/refresh (Cookie: saath_rt, X-Saath-CSRF: 1)
+    API->>DB: Verify tokenHash & rotate (new tokenHash, link replacedById)
+    API-->>Browser: 204 No Content with new Set-Cookie: saath_at, saath_rt
+    Browser->>API: Retry original GET /api/medications (with fresh saath_at)
+    API-->>Browser: 200 OK (data delivered seamlessly)
+
+    Note over User,DB: 4. User Sign Out Flow
+    User->>Browser: Opens UserMenu & clicks "Sign out"
+    Browser->>API: POST /api/auth/logout (Cookie: saath_rt, X-Saath-CSRF: 1)
+    API->>DB: Mark current RefreshToken revokedAt = new Date()
+    API-->>Browser: 204 No Content (Clear saath_at and saath_rt cookies)
+    Browser->>Browser: Clears query cache & redirects to /login
+```
+
+### B. Security Guarantees
+
+- **Zero JS Token Storage**: All tokens live in `httpOnly` cookies. No script, XSS vector, or third-party snippet can read access or refresh credentials.
+- **CSRF Defense**: Custom header `X-Saath-CSRF: 1` required on all state-mutating HTTP methods (POST, PUT, PATCH, DELETE) combined with `SameSite` cookies and Origin allowlist verification.
+- **Refresh Rotation**: Opaque 32-byte tokens hashed with SHA-256 in MongoDB. Each rotation revokes the previous token and links `replacedById`. Concurrent race conditions are protected by a 10-second leeway window; replay of an already-rotated token after leeway revokes the entire family immediately.

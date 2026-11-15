@@ -48,3 +48,31 @@
 - **Context:** Render free web services spin down after 15 minutes of inactivity, terminating internal node-cron or background timers.
 - **Decision:** Background recurring checks (e.g., medication window checks, reminder ticks) are triggered by external HTTPS webhooks (cron-job.org) hitting `/api/internal/tick` protected by a high-entropy `TICK_SECRET`.
 - **Consequences:** Guarantees timely execution regardless of instance sleep states; wakes sleeping dynos reliably when scheduled actions are due.
+
+## ADR 008: Refresh Token Rotation with Leeway Window & Reuse Detection
+
+- **Status:** Accepted
+- **Context:** Mobile or multi-tab web browsers frequently send concurrent requests as an access token expires. Strict one-time refresh rotation without a grace window causes false positive reuse detections and invalidates valid user sessions. Conversely, allowing unconstrained reuse leaves stolen tokens indefinitely active.
+- **Decision:** Implement token family rotation where tokens are stored as SHA-256 hashes. Each rotation generates a new token and marks the previous token rotated with `replacedById`. A 10-second leeway window (`REFRESH_REUSE_LEEWAY_SECONDS`) permits concurrent requests to succeed without revoking the session. Any replay of an already-rotated token after leeway revokes the entire token family immediately.
+- **Consequences:** Safe concurrent request handling; automatic session self-healing; immediate revocation of compromised session families upon credential replay.
+
+## ADR 009: Dual Cookie Architecture with CSRF Header & Origin Allowlist
+
+- **Status:** Accepted
+- **Context:** Storing JWTs or credentials in browser `localStorage` or `sessionStorage` exposes tokens to extraction via XSS. Standard cookie authentication, however, requires robust CSRF defenses.
+- **Decision:** Store credentials exclusively in `httpOnly`, `Secure` cookies with distinct scopes: short-lived access JWT (`saath_at`, path `/`, SameSite=Lax) and long-lived refresh token (`saath_rt`, path `/api/auth`, SameSite=Strict). All state-mutating requests require the custom header `X-Saath-CSRF: 1` and Origin allowlist validation.
+- **Consequences:** Tokens cannot be extracted via JavaScript (WCAG / OWASP compliance); CSRF attacks are prevented because browsers cannot set custom headers cross-origin without explicit CORS authorization.
+
+## ADR 010: Omission of Google Long-Lived Offline Access
+
+- **Status:** Accepted
+- **Context:** Requesting `access_type: "offline"` from Google yields long-lived Google refresh tokens that must be securely persisted and managed.
+- **Decision:** Omit `access_type: "offline"` from Google OAuth scopes. Google is used solely as an identity provider (`openid`, `email`, `profile`). Saath issues and manages its own internal rotating session tokens.
+- **Consequences:** Smaller blast radius; no external Google refresh token revocation management needed; cleaner user consent screen.
+
+## ADR 011: Isolated Demo Login Mode for Local Testing
+
+- **Status:** Accepted
+- **Context:** Development and automated E2E/UI verification environments require predictable authentication without manual Google interactive sign-in dialogs or automated captcha hurdles.
+- **Decision:** Implement `POST /api/auth/demo` gated by `DEMO_LOGIN_ENABLED=true` (default `false` in production). When enabled, it signs in a fixed test user (`demo@saath.invalid`, `isDemo: true`) with the exact same rotating cookie and token mechanics as real users.
+- **Consequences:** Reliable local and CI test execution; production safety guaranteed by server-side gate returning 404 when disabled.

@@ -24,21 +24,29 @@ Every response, whether success or error, includes an `X-Request-Id` HTTP header
 
 ## 2. Status Code to Machine Error Code Mapping
 
-| HTTP Status | Machine Code             | Description                             | Typical Cause                                |
-| ----------- | ------------------------ | --------------------------------------- | -------------------------------------------- |
-| **400**     | `VALIDATION_ERROR`       | Request failed schema validation        | Missing required fields, invalid formats     |
-| **400**     | `INVALID_JSON`           | Body parser failed to parse payload     | Malformed JSON syntax in request body        |
-| **401**     | `UNAUTHENTICATED`        | Missing or invalid authentication token | Expired session, invalid Bearer token        |
-| **403**     | `FORBIDDEN`              | Authenticated caller lacks permissions  | Elder-only action attempted by non-owner     |
-| **404**     | `NOT_FOUND`              | Resource or route does not exist        | Unknown route, deleted record                |
-| **409**     | `CONFLICT`               | Resource conflict in data layer         | Duplicate key error (e.g. Mongoose 11000)    |
-| **413**     | `PAYLOAD_TOO_LARGE`      | Payload exceeds max size limit          | Upload file or body > 100KB (or 4MB in AI)   |
-| **415**     | `UNSUPPORTED_MEDIA_TYPE` | Content-Type header not accepted        | Non-JSON or unsupported audio MIME           |
-| **422**     | `UNPROCESSABLE_ENTITY`   | Semantic validation failed              | Logical inconsistency in payload             |
-| **429**     | `RATE_LIMITED`           | Rate limit threshold exceeded           | Too many requests from client IP             |
-| **500**     | `INTERNAL_ERROR`         | Unexpected server error                 | Uncaught runtime error (stack suppressed)    |
-| **502**     | `UPSTREAM_ERROR`         | Upstream service failed                 | External provider failure (e.g., ElevenLabs) |
-| **503**     | `SERVICE_UNAVAILABLE`    | Service not ready or sleeping           | Database connection down, warm-up phase      |
+| HTTP Status | Machine Code             | Description                              | Typical Cause                                |
+| ----------- | ------------------------ | ---------------------------------------- | -------------------------------------------- |
+| **400**     | `VALIDATION_ERROR`       | Request failed schema validation         | Missing required fields, invalid formats     |
+| **400**     | `INVALID_JSON`           | Body parser failed to parse payload      | Malformed JSON syntax in request body        |
+| **401**     | `UNAUTHENTICATED`        | Missing or invalid authentication token  | Expired session, invalid Bearer token        |
+| **401**     | `TOKEN_EXPIRED`          | Access token JWT has expired (15 min)    | Prompts client to execute refresh rotation   |
+| **401**     | `REFRESH_INVALID`        | Refresh token missing, bad, or expired   | Session revoked or expired (redirect /login) |
+| **401**     | `REFRESH_REUSED`         | Already-rotated refresh token replayed   | Token reuse detected; revokes family         |
+| **401**     | `OAUTH_FAILED`           | OAuth exchange with provider failed      | Google token endpoint failure or denial      |
+| **401**     | `OAUTH_STATE_MISMATCH`   | OAuth state cookie missing or mismatched | Session timeout or CSRF attempt on callback  |
+| **403**     | `FORBIDDEN`              | Authenticated caller lacks permissions   | Elder-only action attempted by non-owner     |
+| **403**     | `CSRF_REJECTED`          | CSRF header or origin allowlist check    | Missing X-Saath-CSRF header or bad Origin    |
+| **403**     | `ACCOUNT_DISABLED`       | User account status set to disabled      | Administrative suspension of account access  |
+| **404**     | `NOT_FOUND`              | Resource or route does not exist         | Unknown route, deleted record, disabled demo |
+| **409**     | `CONFLICT`               | Resource conflict in data layer          | Duplicate key error (e.g. Mongoose 11000)    |
+| **409**     | `REFRESH_RACE`           | Concurrent refresh within leeway window  | Informs client to pause 300ms and retry      |
+| **413**     | `PAYLOAD_TOO_LARGE`      | Payload exceeds max size limit           | Upload file or body > 100KB (or 4MB in AI)   |
+| **415**     | `UNSUPPORTED_MEDIA_TYPE` | Content-Type header not accepted         | Non-JSON or unsupported audio MIME           |
+| **422**     | `UNPROCESSABLE_ENTITY`   | Semantic validation failed               | Logical inconsistency in payload             |
+| **429**     | `RATE_LIMITED`           | Rate limit threshold exceeded            | Too many requests from client IP             |
+| **500**     | `INTERNAL_ERROR`         | Unexpected server error                  | Uncaught runtime error (stack suppressed)    |
+| **502**     | `UPSTREAM_ERROR`         | Upstream service failed                  | External provider failure (e.g., ElevenLabs) |
+| **503**     | `SERVICE_UNAVAILABLE`    | Service not ready or sleeping            | Database connection down, warm-up phase      |
 
 ## 3. Layered Error Handling Flow
 

@@ -24,6 +24,24 @@ services:
         sync: false
       - key: AI_SERVICE_TOKEN
         sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: COOKIE_SECRET
+        generateValue: true
+      - key: ACCESS_TOKEN_TTL_SECONDS
+        value: "900"
+      - key: REFRESH_TOKEN_TTL_DAYS
+        value: "7"
+      - key: REFRESH_REUSE_LEEWAY_SECONDS
+        value: "10"
+      - key: DEMO_LOGIN_ENABLED
+        value: "false"
 
   - type: web
     name: saath-ai

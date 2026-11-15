@@ -76,3 +76,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `npm run lint -w apps/web` exit 0 (forbidden localStorage/sessionStorage enforced); `npm run typecheck -w apps/web` exit 0; `npm run test -w apps/web` exit 0 (17 files passed, 65 tests passed, 95% statement coverage); `npm run build -w apps/web` exit 0. Live browser workflow in Microsoft Edge passed with 0 console runtime errors: /login (76px Google button, demo button), clicked demo transitioning to /app ("Welcome, Saath Demo User", UserMenu, card), opened UserMenu, clicked Sign out transitioning back to /login.
+
+## Phase 1 — Step 8: Docs and config
+
+- Status: PASS
+- Evidence: `node scratch/verify-step8-env.mjs` exit 0 (16/16 env keys in apps/api/.env.example verified across docs/deployment.md, render.yaml, and env.ts). Docs updated: docs/security.md (threat model, rotation, leeway, reuse detection, OAuth CSRF, append-only audit trail); docs/architecture.md (Mermaid sequence diagram for login/init/refresh/logout); docs/error-handling.md (8 new machine error codes in master table); docs/decisions.md (ADRs 008-011). Zero TODOs/placeholders in docs.
