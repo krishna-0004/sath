@@ -1,5 +1,4 @@
 /** @vitest-environment jsdom */
-import React from "react";
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
