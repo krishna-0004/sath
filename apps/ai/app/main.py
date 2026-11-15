@@ -17,6 +17,7 @@ from app.core.logging import get_logger, setup_logging
 from app.core.rate_limit import limiter
 from app.middleware.request_id import RequestIdMiddleware
 from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.routers.audio import router as audio_router
 from app.routers.extraction import router as extraction_router
 from app.routers.health import router as health_router
 
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
 
     application.include_router(health_router)
     application.include_router(extraction_router)
+    application.include_router(audio_router)
 
     @application.exception_handler(AppError)
     async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:

@@ -16,6 +16,9 @@ const AppHomePage = lazy(() =>
 const ProfilePage = lazy(() =>
   import("../pages/ProfilePage.js").then((m) => ({ default: m.ProfilePage })),
 );
+const EmergencyPage = lazy(() =>
+  import("../pages/EmergencyPage.js").then((m) => ({ default: m.EmergencyPage })),
+);
 const NotFoundPage = lazy(() =>
   import("../pages/NotFoundPage.js").then((m) => ({ default: m.NotFoundPage })),
 );
@@ -84,6 +87,15 @@ export const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: "/emergency/:token",
+    element: (
+      <Suspense fallback={<LoadingState message="Loading emergency medical record..." />}>
+        <EmergencyPage />
+      </Suspense>
+    ),
+    errorElement: <RouteErrorBoundary />,
   },
   {
     path: "*",

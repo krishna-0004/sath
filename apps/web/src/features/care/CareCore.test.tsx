@@ -103,7 +103,7 @@ describe("Care Core Web Features", () => {
 
       renderWithProviders(<ProfilePicker />);
 
-      const createBtn = await screen.findByRole("button", { name: /\+ create profile/i });
+      const createBtn = await screen.findByRole("button", { name: /create a profile/i });
       fireEvent.click(createBtn);
 
       expect(screen.getByRole("heading", { name: /create elder profile/i })).toBeInTheDocument();
@@ -122,11 +122,12 @@ describe("Care Core Web Features", () => {
 
       const { container } = renderWithProviders(<TodayView profile={mockProfile} canEdit={true} />);
 
-      expect(await screen.findByText("Metformin")).toBeInTheDocument();
-      expect(screen.getByText("500 mg")).toBeInTheDocument();
-      expect(screen.getByText(/take after food/i)).toBeInTheDocument();
+      const metforminElements = await screen.findAllByText("Metformin");
+      expect(metforminElements.length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/500 mg/i)[0]).toBeInTheDocument();
+      expect(screen.getByText(/after food/i)).toBeInTheDocument();
 
-      const takenBtn = screen.getByRole("button", { name: /mark taken/i });
+      const takenBtn = screen.getByRole("button", { name: /take now/i });
       expect(takenBtn).toBeInTheDocument();
       expect(takenBtn.className).toContain("min-h-[76px]");
 

@@ -146,7 +146,7 @@ def test_extract_lab_report_success() -> None:
 @pytest.mark.asyncio
 async def test_extraction_service_without_api_key_returns_503() -> None:
     """ExtractionService without API key raises 503 SERVICE_UNAVAILABLE."""
-    service = ExtractionService(api_key=None)
+    service = ExtractionService(api_key="")
     with pytest.raises(Exception) as exc_info:
         await service.extract_prescription(ExtractionRequest(base64Data="abc"))
     assert "SERVICE_UNAVAILABLE" in str(getattr(exc_info.value, "code", ""))

@@ -6,27 +6,30 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   variant?: "primary" | "secondary" | "ghost" | "danger" | "sos";
   size?: "primary" | "secondary";
   loading?: boolean;
+  leadingIcon?: React.ReactNode;
+  trailingIcon?: React.ReactNode;
 }
 
 const variantClasses = {
   primary:
-    "bg-teal-700 text-white hover:bg-teal-800 active:bg-teal-900 shadow-sm border border-transparent",
+    "bg-[#0F6B6B] text-white hover:bg-[#0B5555] active:bg-[#083E3E] shadow-sm border border-transparent",
   secondary:
-    "bg-stone-100 text-stone-900 hover:bg-stone-200 active:bg-stone-300 border border-stone-300",
+    "bg-[#F4EEE3] text-[#1B2A2F] hover:bg-[#E6DDCD] active:bg-[#D5C9B5] border border-[#E6DDCD]",
   ghost:
-    "bg-transparent text-stone-700 hover:bg-stone-100 active:bg-stone-200 border border-transparent",
-  danger: "bg-red-700 text-white hover:bg-red-800 active:bg-red-900 border border-transparent",
-  sos: "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 font-bold border-2 border-white shadow-md text-xl",
+    "bg-transparent text-[#1B2A2F] hover:bg-[#F4EEE3] active:bg-[#E6DDCD] border border-transparent",
+  danger:
+    "bg-[#C62828] text-white hover:bg-[#A32020] active:bg-[#801818] border border-transparent",
+  sos: "bg-[#C62828] text-white hover:bg-[#A32020] active:bg-[#801818] font-black border-2 border-white shadow-xl text-2xl tracking-wide",
 };
 
 const sizeClasses = {
   // Touch target sizes: Primary (>= 76px) for major actions, Secondary (>= 56px) for standard actions
-  primary: "min-h-[76px] px-8 text-xl font-medium rounded-2xl gap-3",
-  secondary: "min-h-[56px] px-6 text-lg font-medium rounded-xl gap-2",
+  primary: "min-h-[76px] px-8 text-xl font-bold rounded-full gap-3",
+  secondary: "min-h-[56px] px-6 text-lg font-bold rounded-full gap-2",
 };
 
 /**
- * Accessible button enforcing touch target sizes (76px / 56px) and ARIA states.
+ * Accessible pill button enforcing touch target sizes (76px / 56px), ARIA states, and icon slots.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -36,6 +39,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       variant = "primary",
       size = "secondary",
       loading = false,
+      leadingIcon,
+      trailingIcon,
       disabled,
       type = "button",
       ...props
@@ -51,7 +56,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         aria-busy={loading ? "true" : undefined}
         className={cn(
-          "inline-flex items-center justify-center transition-colors duration-150 cursor-pointer select-none disabled:opacity-60 disabled:cursor-not-allowed",
+          "inline-flex items-center justify-center transition-all duration-150 cursor-pointer select-none disabled:opacity-60 disabled:cursor-not-allowed press",
           variantClasses[variant],
           sizeClasses[size],
           className,
@@ -59,7 +64,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading && <Spinner size="sm" />}
+        {!loading && leadingIcon}
         <span>{children}</span>
+        {!loading && trailingIcon}
       </button>
     );
   },

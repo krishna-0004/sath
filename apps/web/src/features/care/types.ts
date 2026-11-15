@@ -240,3 +240,43 @@ export interface MetricComparisonResponse {
     neutralDiffText: string;
   };
 }
+
+export interface SosTriggerResponse {
+  emergencyId: string;
+  shareToken: string;
+  shareUrl: string;
+  elderName: string;
+  emergencyPhone: string | null;
+  doctorContactsNotified: number;
+  whatsappLinks: Array<{ doctorName: string; whatsappUrl: string; kind: string }>;
+  triggeredAt: string;
+}
+
+export interface EmergencySummary {
+  elderName: string;
+  emergencyPhone: string | null;
+  timezone: string;
+  medicines: Array<{
+    name: string;
+    strengthText: string;
+    frequencyText: string;
+    anchors: string[];
+    withFood: string | null;
+    instructions: string;
+  }>;
+  doctorContacts: Array<{
+    name: string;
+    kind: string;
+    whatsappNumber: string;
+  }>;
+  recentReports: Array<{
+    title: string;
+    testDate: string;
+    metrics: Array<{
+      name: string;
+      value: number | string;
+      unit: string;
+      flag: string;
+    }>;
+  }>;
+}

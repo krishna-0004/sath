@@ -336,4 +336,19 @@ export const careApi = {
       `/profiles/${profileId}/reports/compare?metricName=${encodeURIComponent(metricName)}`,
     );
   },
+
+  // Emergency SOS & ShareLink
+  async triggerSos(
+    profileId: string,
+    payload: { locationText?: string; latitude?: number; longitude?: number } = {},
+  ): Promise<import("./types.js").SosTriggerResponse> {
+    return apiRequest<import("./types.js").SosTriggerResponse>(`/profiles/${profileId}/sos`, {
+      method: "POST",
+      body: payload,
+    });
+  },
+
+  async getEmergencyShare(token: string): Promise<import("./types.js").EmergencySummary> {
+    return apiRequest<import("./types.js").EmergencySummary>(`/share/${token}`);
+  },
 };

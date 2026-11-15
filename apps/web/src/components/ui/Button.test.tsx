@@ -33,10 +33,10 @@ describe("Button Component", () => {
 
   it("renders distinct variants (primary, secondary, danger, sos)", () => {
     const { rerender } = render(<Button variant="sos">SOS</Button>);
-    expect(screen.getByRole("button", { name: "SOS" }).className).toContain("bg-red-600");
+    expect(screen.getByRole("button", { name: "SOS" }).className).toContain("bg-[#C62828]");
 
     rerender(<Button variant="danger">Delete</Button>);
-    expect(screen.getByRole("button", { name: "Delete" }).className).toContain("bg-red-700");
+    expect(screen.getByRole("button", { name: "Delete" }).className).toContain("bg-[#C62828]");
   });
 
   it("has no accessibility violations", async () => {

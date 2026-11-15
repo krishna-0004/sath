@@ -12,11 +12,17 @@ import { doseEventRepository } from "../src/repositories/dose-event.repository.j
 import { appointmentRepository } from "../src/repositories/appointment.repository.js";
 import { profileRepository } from "../src/repositories/profile.repository.js";
 import { membershipRepository } from "../src/repositories/membership.repository.js";
+import { uploadService } from "../src/services/upload.service.js";
+import { reportService } from "../src/services/report.service.js";
+import { reportRepository } from "../src/repositories/report.repository.js";
+import { prescriptionDiffService } from "../src/services/prescription-diff.service.js";
+import { aiClientService } from "../src/services/ai-client.service.js";
 import type { ProfileDocument } from "../src/models/profile.model.js";
 import type { MedicineDocument } from "../src/models/medicine.model.js";
 import type { AppointmentDocument } from "../src/models/appointment.model.js";
 import type { DoseEventDocument } from "../src/models/dose-event.model.js";
 import type { MembershipDocument } from "../src/models/membership.model.js";
+import type { ReportDocument } from "../src/models/report.model.js";
 
 describe("Service Branch Coverage Edge Cases", () => {
   const fakeId = new mongoose.Types.ObjectId().toString();
@@ -225,6 +231,155 @@ describe("Service Branch Coverage Edge Cases", () => {
       await expect(
         profileService.updateMemberRole(fakeId, fakeId2, "viewer", "user-1"),
       ).rejects.toThrow("Member not found in profile");
+    });
+  });
+
+  describe("UploadService branches", () => {
+    it("validates missing file, invalid mime, and oversized payload", () => {
+      expect(() => uploadService.validateFile(undefined)).toThrow("No file provided");
+      expect(() => uploadService.validateFile({ mimetype: "video/mp4", size: 100 })).toThrow(
+        "Unsupported media type",
+      );
+      expect(() =>
+        uploadService.validateFile({ mimetype: "image/jpeg", size: 11 * 1024 * 1024 }),
+      ).toThrow("File size exceeds 10MB limit");
+    });
+
+    it("throws NotFoundError when mock asset is not found", () => {
+      expect(() => uploadService.getMockAsset("missing-upload-id")).toThrow("Upload not found");
+    });
+  });
+
+  describe("ReportService branches", () => {
+    it("throws NotFoundError in deleteReport when report does not exist or profile mismatches", async () => {
+      vi.spyOn(reportRepository, "findById").mockResolvedValueOnce(null);
+      await expect(reportService.deleteReport(fakeId, fakeId2, "user-1")).rejects.toThrow(
+        "Report not found",
+      );
+
+      vi.spyOn(reportRepository, "findById").mockResolvedValueOnce({
+        id: fakeId2,
+        profileId: new mongoose.Types.ObjectId(fakeId2), // different from fakeId
+      } as unknown as ReportDocument);
+      await expect(reportService.deleteReport(fakeId, fakeId2, "user-1")).rejects.toThrow(
+        "Report not found",
+      );
+    });
+
+    it("throws NotFoundError in getReportById when profile mismatches", async () => {
+      vi.spyOn(reportRepository, "findById").mockResolvedValueOnce({
+        id: fakeId2,
+        profileId: new mongoose.Types.ObjectId(fakeId2),
+      } as unknown as ReportDocument);
+      await expect(reportService.getReportById(fakeId, fakeId2)).rejects.toThrow(
+        "Report not found",
+      );
+    });
+
+    it("handles compareMetric edge cases: empty history, zero previous value, and non-numeric value", async () => {
+      // Empty history
+      vi.spyOn(reportRepository, "findMetricHistory").mockResolvedValueOnce([]);
+      const emptyRes = await reportService.compareMetric(fakeId, "HbA1c");
+      expect(emptyRes.history).toHaveLength(0);
+
+      // Non-numeric value and zero previous
+      const rep1 = {
+        testDate: new Date("2026-01-01"),
+        metrics: [{ name: "Biomarker", value: 0, unit: "mg/dL", flag: "normal" }],
+      } as unknown as ReportDocument;
+      const rep2 = {
+        testDate: new Date("2026-02-01"),
+        metrics: [{ name: "Biomarker", value: "Positive", unit: "", flag: "high" }],
+      } as unknown as ReportDocument;
+
+      vi.spyOn(reportRepository, "findMetricHistory").mockResolvedValueOnce([rep1, rep2]);
+      const nonNumRes = await reportService.compareMetric(fakeId, "Biomarker");
+      expect(nonNumRes.history).toHaveLength(2);
+      expect(nonNumRes.history[1]?.diff.text).toBe("qualitative or non-numeric metric");
+    });
+  });
+
+  describe("PrescriptionDiffService branches", () => {
+    it("handles variations in extraction anchors and frequency changes", async () => {
+      vi.spyOn(uploadService, "getMockAsset").mockReturnValueOnce({
+        uploadId: "mock-1",
+        buffer: Buffer.from("test"),
+        fileType: "application/pdf",
+        bytes: 4,
+      });
+
+      vi.spyOn(aiClientService, "extractPrescription").mockResolvedValueOnce({
+        medicines: [
+          {
+            name: "Metformin",
+            strengthText: "1000mg", // changed
+            frequencyText: "Twice daily",
+            anchors: ["breakfast", "invalid_anchor"],
+            withFood: false,
+            instructions: "Take with food",
+          },
+          {
+            name: "Aspirin",
+            strengthText: "75mg",
+            frequencyText: "Once daily",
+            anchors: ["breakfast"],
+            withFood: "with",
+            instructions: "Morning",
+          },
+        ],
+        rawDoctorNotes: "Notes",
+        rawDateText: null,
+      });
+
+      vi.spyOn(medicineRepository, "findActiveByProfile").mockResolvedValueOnce([
+        {
+          id: fakeId,
+          name: "Metformin",
+          strengthText: "500mg",
+          frequencyText: "Twice daily",
+          anchors: ["breakfast"],
+          withFood: "with",
+          notes: "Old notes",
+        } as unknown as MedicineDocument,
+        {
+          id: fakeId2,
+          name: "Aspirin",
+          strengthText: "75mg",
+          frequencyText: "Once daily",
+          anchors: ["breakfast"],
+          withFood: "with",
+          notes: "Morning",
+        } as unknown as MedicineDocument,
+      ]);
+
+      const res = await prescriptionDiffService.previewPrescription(fakeId, "mock-1");
+      expect(res.diff.updated).toHaveLength(1);
+      expect(res.diff.unchanged).toHaveLength(1);
+      expect(res.diff.updated[0]?.strengthText).toBe("1000mg");
+    });
+
+    it("handles confirmPrescription when repository updates return null", async () => {
+      vi.spyOn(medicineRepository, "update").mockResolvedValueOnce(null);
+      vi.spyOn(medicineRepository, "markStopped").mockResolvedValueOnce(null);
+
+      const res = await prescriptionDiffService.confirmPrescription(fakeId, "user-1", {
+        applyAdded: [],
+        applyUpdated: [
+          {
+            id: fakeId,
+            name: "Meds",
+            strengthText: "10mg",
+            frequencyText: "daily",
+            anchors: ["breakfast"],
+            withFood: null,
+            instructions: "test",
+          },
+        ],
+        stopDiscontinuedIds: [fakeId2],
+      });
+
+      expect(res.applied.updated).toBe(0);
+      expect(res.applied.stopped).toBe(0);
     });
   });
 });

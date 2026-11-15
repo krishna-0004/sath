@@ -29,5 +29,6 @@ def require_ai_secret(
     return token
 
 
-# Alias for backward compatibility
+# Aliases for backward compatibility
 require_service_token = require_ai_secret
+require_internal_auth = require_ai_secret

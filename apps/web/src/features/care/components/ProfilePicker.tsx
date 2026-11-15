@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { PlusCircle, KeyRound } from "lucide-react";
 import { Badge } from "../../../components/ui/Badge.js";
 import { Button } from "../../../components/ui/Button.js";
 import { Card } from "../../../components/ui/Card.js";
@@ -7,6 +8,7 @@ import { Input } from "../../../components/ui/Input.js";
 import { Label } from "../../../components/ui/Label.js";
 import { Modal } from "../../../components/ui/Modal.js";
 import { LoadingState } from "../../../components/ui/LoadingState.js";
+import { EmptyFamily } from "../../../components/illustrations/index.js";
 import { useCreateProfile, useJoinProfile, useProfiles } from "../hooks/use-care-queries.js";
 
 export function ProfilePicker(): React.JSX.Element {
@@ -103,121 +105,123 @@ export function ProfilePicker(): React.JSX.Element {
 
   return (
     <div className="space-y-8">
-      {/* Top action bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-            Care Circles
-          </h2>
-          <p className="text-stone-600 text-base mt-1">
-            Select an elder to view medication schedules, health reports, and appointments.
-          </p>
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setIsJoinOpen(true)}
-            className="flex-1 sm:flex-none"
-          >
-            Join with Code
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => setIsCreateOpen(true)}
-            className="flex-1 sm:flex-none"
-          >
-            + Create Profile
-          </Button>
-        </div>
+      {/* Top action cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
+          type="button"
+          onClick={() => setIsCreateOpen(true)}
+          className="p-6 rounded-[24px] border-2 border-line bg-surface hover:border-primary-strong/40 text-left transition-all lift flex items-center justify-between group shadow-xs"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary-soft text-primary-strong flex items-center justify-center font-bold">
+              <PlusCircle className="w-7 h-7" aria-hidden="true" />
+            </div>
+            <div>
+              <span className="text-xl font-bold text-ink block font-display">
+                Create a Profile
+              </span>
+              <span className="text-sm text-ink-muted block">
+                Start a new care circle for an elder
+              </span>
+            </div>
+          </div>
+          <span className="text-primary-strong font-black text-2xl group-hover:translate-x-1 transition-transform">
+            →
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setIsJoinOpen(true)}
+          className="p-6 rounded-[24px] border-2 border-line bg-surface hover:border-amber/50 text-left transition-all lift flex items-center justify-between group shadow-xs"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-soft text-ink flex items-center justify-center font-bold">
+              <KeyRound className="w-7 h-7" aria-hidden="true" />
+            </div>
+            <div>
+              <span className="text-xl font-bold text-ink block font-display">
+                Join with a Code
+              </span>
+              <span className="text-sm text-ink-muted block">
+                Connect to an existing family circle
+              </span>
+            </div>
+          </div>
+          <span className="text-ink font-black text-2xl group-hover:translate-x-1 transition-transform">
+            →
+          </span>
+        </button>
       </div>
 
-      {/* Profiles list */}
-      {profiles.length === 0 ? (
-        <Card className="p-12 text-center max-w-xl mx-auto border-2 border-dashed border-stone-300 rounded-3xl bg-white">
-          <div
-            className="h-16 w-16 mx-auto mb-4 rounded-2xl bg-teal-100 text-teal-800 flex items-center justify-center text-3xl font-bold"
-            aria-hidden="true"
-          >
-            🏠
-          </div>
-          <h3 className="text-2xl font-bold text-stone-900 mb-2">No Profiles Yet</h3>
-          <p className="text-stone-600 mb-6 leading-relaxed">
-            Create a profile for your elder to start organizing medication anchors, or join an
-            existing family circle using an invitation code.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3">
-            <Button
-              type="button"
-              variant="primary"
-              onClick={() => setIsCreateOpen(true)}
-              className="min-h-[56px] text-lg px-8"
-            >
-              Create Elder Profile
-            </Button>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setIsJoinOpen(true)}
-              className="min-h-[56px] text-lg px-8"
-            >
-              Join with Code
-            </Button>
-          </div>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {profiles.map(({ profile, role }) => (
-            <Card
-              key={profile.id}
-              className="bg-white border-2 border-stone-200 hover:border-teal-700 transition-colors p-6 rounded-3xl shadow-xs flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="h-12 w-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-bold text-xl"
-                      aria-hidden="true"
-                    >
-                      {profile.elderName.charAt(0).toUpperCase()}
+      {/* Profiles section */}
+      <div>
+        <h2 className="text-2xl font-bold text-ink tracking-tight mb-4 font-display">
+          Active Care Circles ({profiles.length})
+        </h2>
+
+        {profiles.length === 0 ? (
+          <Card className="p-12 text-center max-w-xl mx-auto border-2 border-dashed border-line rounded-[28px] bg-surface">
+            <EmptyFamily />
+            <h3 className="text-2xl font-bold text-ink mt-4 mb-2">No Profiles Yet</h3>
+            <p className="text-ink-muted mb-6 leading-relaxed text-base">
+              Create a profile for your elder to start organizing medication anchors, or join an
+              existing family circle using an invitation code.
+            </p>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {profiles.map(({ profile, role }) => (
+              <Card
+                key={profile.id}
+                className="bg-white border-2 border-stone-200 hover:border-teal-700 transition-colors p-6 rounded-3xl shadow-xs flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-12 w-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center font-bold text-xl"
+                        aria-hidden="true"
+                      >
+                        {profile.elderName.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-stone-950 leading-tight">
+                          {profile.elderName}
+                        </h3>
+                        <p className="text-stone-500 text-sm">Zone: {profile.timezone}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-stone-950 leading-tight">
-                        {profile.elderName}
-                      </h3>
-                      <p className="text-stone-500 text-sm">Zone: {profile.timezone}</p>
-                    </div>
+                    <Badge variant={role === "elder" ? "primary" : "neutral"}>
+                      {role === "elder" ? "Elder (Owner)" : role === "editor" ? "Editor" : "Viewer"}
+                    </Badge>
                   </div>
-                  <Badge variant={role === "elder" ? "primary" : "neutral"}>
-                    {role === "elder" ? "Elder (Owner)" : role === "editor" ? "Editor" : "Viewer"}
-                  </Badge>
+
+                  {role === "elder" && (
+                    <div className="mb-6 p-3 bg-stone-50 rounded-xl border border-stone-200">
+                      <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider block mb-1">
+                        Join Code
+                      </span>
+                      <span className="font-mono text-base font-bold text-teal-900 tracking-wider">
+                        {profile.joinCode}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {role === "elder" && (
-                  <div className="mb-6 p-3 bg-stone-50 rounded-xl border border-stone-200">
-                    <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider block mb-1">
-                      Join Code
-                    </span>
-                    <span className="font-mono text-base font-bold text-teal-900 tracking-wider">
-                      {profile.joinCode}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => navigate(`/p/${profile.id}`)}
-                className="w-full mt-4 min-h-[56px] text-lg font-bold"
-              >
-                Open Care Hub →
-              </Button>
-            </Card>
-          ))}
-        </div>
-      )}
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={() => navigate(`/p/${profile.id}`)}
+                  className="w-full mt-4 min-h-[56px] text-lg font-bold"
+                >
+                  Open Care Hub →
+                </Button>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Modal: Create Profile */}
       <Modal

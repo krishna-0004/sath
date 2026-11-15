@@ -11,3 +11,5 @@ export * from "./components/SettingsView.js";
 export * from "./components/ScanConfirmModal.js";
 export * from "./components/ReportLensModal.js";
 export * from "./components/ReportsView.js";
+export * from "./components/EmergencySosModal.js";
+export * from "./components/CareBriefView.js";

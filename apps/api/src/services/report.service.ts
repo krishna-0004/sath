@@ -162,6 +162,8 @@ export const reportService = {
           const sign = absoluteDiff > 0 ? "+" : "";
           const unitStr = metric.unit ? ` ${metric.unit}` : "";
           diffText = `changed by ${sign}${absoluteDiff}${unitStr} from ${prevPoint.testDateFormatted}`;
+        } else {
+          diffText = "qualitative or non-numeric metric";
         }
       }
 

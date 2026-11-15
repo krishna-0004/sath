@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Modal } from "../../../components/ui/Modal.js";
+import { Stepper } from "../../../components/ui/Stepper.js";
 import { careApi } from "../api.js";
 import type {
   PrescriptionDiff,
@@ -136,6 +137,20 @@ export function ScanConfirmModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Scan Prescription & Review Changes">
+      {/* Stepper Header */}
+      <div className="mb-6">
+        <Stepper
+          steps={[
+            { id: "capture", label: "Capture" },
+            { id: "review", label: "Review" },
+            { id: "saved", label: "Saved" },
+          ]}
+          currentStepIndex={
+            step === "upload" || step === "analyzing" ? 0 : step === "review" ? 1 : 2
+          }
+        />
+      </div>
+
       {/* Polite live region for screen readers */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {statusMessage}

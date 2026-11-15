@@ -42,7 +42,10 @@ class ExtractionService:
     """Orchestrates document extraction with Gemini API."""
 
     def __init__(self, api_key: str | None = None) -> None:
-        self.api_key = api_key or get_settings().GEMINI_API_KEY
+        if api_key == "":
+            self.api_key = None
+        else:
+            self.api_key = api_key if api_key is not None else get_settings().GEMINI_API_KEY
         self._client: genai.Client | None = None
         if self.api_key:
             self._client = genai.Client(api_key=self.api_key)
