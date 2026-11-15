@@ -16,7 +16,7 @@
     "build": "npm run build -w apps/web && npm run build -w apps/api",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "prepare": "husky"
+    "prepare": "node -e \"try { (await import('husky')).default() } catch {}\""
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
