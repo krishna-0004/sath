@@ -2,8 +2,12 @@ import "dotenv/config";
 import { createApp } from "./app.js";
 import { env } from "./config/env.js";
 import { logger } from "./config/logger.js";
+import { configurePassport } from "./config/passport.js";
 import { connectDb, disconnectDb } from "./db/connect.js";
 import type { Server } from "node:http";
+
+// Register Passport authentication strategies
+configurePassport();
 
 const app = createApp();
 

@@ -10,26 +10,20 @@ import { notFoundMiddleware } from "./middleware/not-found.js";
 import { globalLimiter } from "./middleware/rate-limit.js";
 import { requestIdMiddleware } from "./middleware/request-id.js";
 import { securityMiddleware } from "./middleware/security.js";
-import { apiRouter } from "./routes/index.js";
+import { createApiRouter } from "./routes/index.js";
+import type { AuthControllerDependencies } from "./controllers/auth.controller.js";
+import { configurePassport } from "./config/passport.js";
+
+export type AppOptions = AuthControllerDependencies;
 
 /**
  * Creates and configures the Express application.
- *
- * Middleware execution order:
- * 1. request-id       - Assigns or echoes unique UUID tracing identifier
- * 2. http-logger      - Structured request/response logging via Pino
- * 3. security(helmet) - Hardens security headers, CSP, HSTS, frameguard
- * 4. cors             - Restricts allowed origins and credentials
- * 5. compression      - Deflate / Gzip HTTP responses
- * 6. express.json     - Parses JSON bodies with 100kb limit
- * 7. cookie-parser    - Parses signed/unsigned cookies
- * 8. no-sql-injection - Rejects queries or bodies with "$" or "." keys
- * 9. globalLimiter    - IP rate limiting (100 req / 15 min)
- * 10. routes          - Application API routes mounted under /api
- * 11. not-found       - 404 handler returning standard error envelope
- * 12. error-handler   - Central exception handler catching all errors
+ * Accepts optional dependency overrides (such as OAuth stubs for test environments).
  */
-export function createApp(): Express {
+export function createApp(options: AppOptions = {}): Express {
+  // Ensure Passport strategy is registered
+  configurePassport();
+
   const app = express();
 
   // Render runs behind a reverse proxy
@@ -64,7 +58,7 @@ export function createApp(): Express {
   app.use(globalLimiter);
 
   // 10. Mount API Routes under /api
-  app.use("/api", apiRouter);
+  app.use("/api", createApiRouter(options));
 
   // 11. 404 Handler
   app.use(notFoundMiddleware);

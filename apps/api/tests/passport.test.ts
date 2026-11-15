@@ -11,7 +11,6 @@ import {
   RefreshReusedError,
   TokenExpiredError,
 } from "../src/errors/http-errors.js";
-import { verifyGoogleProfile } from "../src/services/auth.service.js";
 
 describe("Passport Strategy Configuration", () => {
   it("registers Google OAuth strategy in passport", () => {
@@ -54,38 +53,5 @@ describe("Phase 1 Authentication HTTP Errors", () => {
     const accountDisabled = new AccountDisabledError();
     expect(accountDisabled.code).toBe("ACCOUNT_DISABLED");
     expect(accountDisabled.status).toBe(403);
-  });
-});
-
-describe("Google Profile Verification Stub", () => {
-  it("verifies and extracts user details from valid verified Google profile", async () => {
-    const validProfile = {
-      id: "google-123456",
-      displayName: "Elder User",
-      _json: {
-        email_verified: true,
-        email: "user@example.com",
-        name: "Elder User",
-        picture: "https://example.com/avatar.png",
-      },
-    };
-
-    const user = await verifyGoogleProfile(validProfile);
-    expect(user.googleId).toBe("google-123456");
-    expect(user.email).toBe("user@example.com");
-    expect(user.name).toBe("Elder User");
-  });
-
-  it("throws OAuthFailedError when email is not verified", async () => {
-    const unverifiedProfile = {
-      id: "google-123456",
-      displayName: "Unverified User",
-      _json: {
-        email_verified: false,
-        email: "unverified@example.com",
-      },
-    };
-
-    await expect(verifyGoogleProfile(unverifiedProfile)).rejects.toThrow(OAuthFailedError);
   });
 });

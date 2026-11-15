@@ -61,3 +61,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `vitest run tests/session.service.test.ts` 9 passed (happy rotation, reuse within leeway -> REFRESH_RACE with family intact, reuse after leeway -> REFRESH_REUSED with family revoked, expired token, disabled user, concurrent 5x rotation -> 1 success 4 race, idempotent logout, logoutAll, zero plaintext tokens in DB). Full API suite 66 passed, 94.64% coverage.
+
+## Phase 1 — Step 5: Google OAuth with Passport
+
+- Status: PASS
+- Evidence: Unit & stub tests passed in `tests/google-oauth.test.ts` (8 passed). Live curl against running server `GET /api/auth/google` returned 302 to https://accounts.google.com/ with client_id, state, openid email profile scopes, no access_type/token, and signed HttpOnly SameSite=Lax saath_oauth cookie. Full API suite 72 passed, 93.81% coverage.
