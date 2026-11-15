@@ -32,6 +32,8 @@ htmlcov/
 # Testing & Coverage
 coverage/
 .vitest/
+test-results/
+playwright-report/
 
 # IDE / Editor
 .vscode/*

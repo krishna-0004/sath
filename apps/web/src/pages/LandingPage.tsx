@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Badge } from "../components/ui/Badge.js";
 import { Button } from "../components/ui/Button.js";
 import { Card } from "../components/ui/Card.js";
@@ -24,7 +25,15 @@ export function LandingPage(): React.JSX.Element {
             </div>
             <span className="text-2xl font-bold tracking-tight text-teal-900">Saath</span>
           </div>
-          <Badge variant="primary">Elder-First Care</Badge>
+          <div className="flex items-center gap-4">
+            <Badge variant="primary">Elder-First Care</Badge>
+            <Link
+              to="/login"
+              className="px-4 py-2 text-base font-semibold text-teal-800 hover:text-teal-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 rounded-xl"
+            >
+              Sign in
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -43,37 +52,18 @@ export function LandingPage(): React.JSX.Element {
             single, calm space where the elder always retains full control and consent.
           </p>
 
-          {/* Placeholders for upcoming Phase 1 authentication */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16">
-            <div className="w-full relative group">
-              <Button
-                variant="primary"
-                size="primary"
-                className="w-full opacity-60 cursor-not-allowed"
-                aria-disabled="true"
-                title="Coming next in Phase 1"
-              >
+            <Link to="/login" className="w-full">
+              <Button variant="primary" size="primary" className="w-full">
                 Sign in with Google
               </Button>
-              <span className="block mt-2 text-sm text-stone-500 font-medium">
-                Coming next in Phase 1
-              </span>
-            </div>
+            </Link>
 
-            <div className="w-full relative group">
-              <Button
-                variant="secondary"
-                size="primary"
-                className="w-full opacity-60 cursor-not-allowed"
-                aria-disabled="true"
-                title="Coming next in Phase 1"
-              >
+            <Link to="/login" className="w-full">
+              <Button variant="secondary" size="primary" className="w-full">
                 Try demo
               </Button>
-              <span className="block mt-2 text-sm text-stone-500 font-medium">
-                Coming next in Phase 1
-              </span>
-            </div>
+            </Link>
           </div>
 
           {/* Principles Grid */}

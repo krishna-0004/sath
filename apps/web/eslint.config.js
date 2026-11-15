@@ -31,6 +31,30 @@ export default [
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
       "no-console": "error",
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "window",
+          property: "localStorage",
+          message: "Hard Rule 1: Never use localStorage. Tokens live only in httpOnly cookies.",
+        },
+        {
+          object: "window",
+          property: "sessionStorage",
+          message: "Hard Rule 1: Never use sessionStorage. Tokens live only in httpOnly cookies.",
+        },
+      ],
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "localStorage",
+          message: "Hard Rule 1: Never use localStorage. Tokens live only in httpOnly cookies.",
+        },
+        {
+          name: "sessionStorage",
+          message: "Hard Rule 1: Never use sessionStorage. Tokens live only in httpOnly cookies.",
+        },
+      ],
     },
   },
 ];

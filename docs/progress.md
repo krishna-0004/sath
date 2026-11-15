@@ -71,3 +71,8 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `vitest run tests/auth-endpoints.test.ts` 8 passed. Full API suite 80 passed (coverage 92.82%). Real live curls confirmed CSRF rejection without `X-Saath-CSRF: 1` (403), demo login setting `saath_at` & `saath_rt` cookies (204), `GET /api/auth/me` (200), `POST /api/auth/refresh` rotating tokens & reuse detection after leeway (401 REFRESH_REUSED with family revoked), idempotent logout (204), demo 404 when disabled, and rate limiter 429 on attempt 21 with standard envelope and Retry-After.
+
+## Phase 1 — Step 7: Frontend: apps/web
+
+- Status: PASS
+- Evidence: `npm run lint -w apps/web` exit 0 (forbidden localStorage/sessionStorage enforced); `npm run typecheck -w apps/web` exit 0; `npm run test -w apps/web` exit 0 (17 files passed, 65 tests passed, 95% statement coverage); `npm run build -w apps/web` exit 0. Live browser workflow in Microsoft Edge passed with 0 console runtime errors: /login (76px Google button, demo button), clicked demo transitioning to /app ("Welcome, Saath Demo User", UserMenu, card), opened UserMenu, clicked Sign out transitioning back to /login.

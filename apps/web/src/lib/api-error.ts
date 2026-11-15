@@ -11,6 +11,7 @@ export class ApiError extends Error {
   public readonly code: string;
   public readonly details?: ApiErrorDetail[];
   public readonly requestId?: string;
+  public readonly _isApiError = true;
 
   constructor(
     status: number,
@@ -32,7 +33,9 @@ export class ApiError extends Error {
  * Type guard to identify ApiError instances.
  */
 export function isApiError(err: unknown): err is ApiError {
-  return err instanceof ApiError;
+  return (
+    err instanceof ApiError || (typeof err === "object" && err !== null && "_isApiError" in err)
+  );
 }
 
 /**

@@ -5,6 +5,7 @@ const webEnvSchema = z.object({
   BASE_URL: z.string().default("/"),
   PROD: z.boolean().default(false),
   DEV: z.boolean().default(true),
+  VITE_DEMO_LOGIN_ENABLED: z.string().default("false"),
 });
 
 export type WebEnv = z.infer<typeof webEnvSchema>;

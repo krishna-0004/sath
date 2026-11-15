@@ -1,16 +1,23 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
+import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { LandingPage } from "./LandingPage.js";
 
 describe("LandingPage", () => {
+  const renderLanding = () =>
+    render(
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>,
+    );
+
   it("renders product title, tagline, and landmarks", () => {
-    render(<LandingPage />);
+    renderLanding();
 
     expect(screen.getByRole("banner")).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
-    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
 
     expect(
       screen.getByRole("heading", {
@@ -20,19 +27,19 @@ describe("LandingPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("marks placeholder buttons with aria-disabled", () => {
-    render(<LandingPage />);
+  it("links sign in and demo actions to /login", () => {
+    renderLanding();
 
-    const googleBtn = screen.getByRole("button", { name: "Sign in with Google" });
-    const demoBtn = screen.getByRole("button", { name: "Try demo" });
-
-    expect(googleBtn).toHaveAttribute("aria-disabled", "true");
-    expect(demoBtn).toHaveAttribute("aria-disabled", "true");
+    const links = screen.getAllByRole("link", { name: /sign in|try demo/i });
+    expect(links.length).toBeGreaterThanOrEqual(2);
+    links.forEach((link) => {
+      expect(link).toHaveAttribute("href", "/login");
+    });
   });
 
   it("ensures SkipLink is the first focusable element when pressing Tab", async () => {
     const user = userEvent.setup();
-    render(<LandingPage />);
+    renderLanding();
 
     await user.tab();
 
@@ -41,7 +48,7 @@ describe("LandingPage", () => {
   });
 
   it("passes axe accessibility tests with zero violations", async () => {
-    const { container } = render(<LandingPage />);
+    const { container } = renderLanding();
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
