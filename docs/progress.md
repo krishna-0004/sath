@@ -141,3 +141,18 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: Tailwind CSS v4 design tokens (Cream canvas #FBF7F0, Deep Teal #0F6B6B, Amber #F2A93B). 12 color contrast pairs verified (5.3:1 to 14.8:1, WCAG 2.2 AA). Fraunces variable font + Inter. 76px primary touch targets, 56px secondary. Cookie-based theme & text size preferences (`saath_pref`). Full test suite across monorepo passing (Web: 78 passed, API: 110 passed, AI: 26 passed, 87.1% coverage).
+
+## Phase 2–5 — Milestone 3: Emergency SOS & Public Emergency View
+
+- Status: PASS
+- Evidence: `apps/api` vitest: 3 passed (emergency trigger with WhatsApp wa.me link generation, 24-hr TTL ShareLink, public token lookup without auth, medicine & contact disclosure). `apps/web` vitest: 2 passed (SOS floating button, modal confirmation, public emergency view, axe accessibility clean).
+
+## Phase 2–5 — Milestone 4: Care Brief & Doctor Summary
+
+- Status: PASS
+- Evidence: `apps/web` vitest: 78 passed across 21 test suites. Printable care brief view with `@media print` rules, neutral deterministic trend notes, consultation summary.
+
+## Phase 2–5 — Final: Accessible UI Makeover
+
+- Status: PASS
+- Evidence: Tailwind CSS v4 design tokens (Cream canvas #FBF7F0, Deep Teal #0F6B6B, Amber #F2A93B). 12 color contrast pairs verified (5.3:1 to 14.8:1, WCAG 2.2 AA). Fraunces variable font + Inter. 76px primary touch targets, 56px secondary. Cookie-based theme & text size preferences (`saath_pref`). Full test suite across monorepo passing (Web: 78 passed, API: 110 passed, AI: 26 passed, 87.1% coverage).
