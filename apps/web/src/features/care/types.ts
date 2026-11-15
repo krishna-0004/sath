@@ -175,3 +175,68 @@ export interface UploadAssetResponse {
   fileType: string;
   bytes: number;
 }
+
+export type MetricFlag = "normal" | "low" | "high" | "unknown";
+
+export interface ReportMetric {
+  name: string;
+  value: number | string;
+  unit: string;
+  referenceRangeText: string;
+  flag: MetricFlag;
+}
+
+export interface Report {
+  id: string;
+  profileId: string;
+  title: string;
+  testDate: string;
+  labName: string;
+  metrics: ReportMetric[];
+  fileUrl: string;
+  notes: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReportPreviewResponse {
+  preview: {
+    title: string;
+    testDate: string | null;
+    labName: string | null;
+    metrics: ReportMetric[];
+    notes: string | null;
+  };
+  uploadId: string;
+}
+
+export interface CreateReportPayload {
+  title: string;
+  testDate: string;
+  labName?: string;
+  metrics: ReportMetric[];
+  fileUrl?: string;
+  notes?: string;
+}
+
+export interface MetricComparisonPoint {
+  reportId: string;
+  title: string;
+  testDate: string;
+  value: number | string;
+  unit: string;
+  flag: string;
+}
+
+export interface MetricComparisonResponse {
+  metricName: string;
+  current: MetricComparisonPoint;
+  previous: MetricComparisonPoint | null;
+  comparison: {
+    absoluteDiff: number | null;
+    percentDiff: number | null;
+    daysBetween: number | null;
+    neutralDiffText: string;
+  };
+}

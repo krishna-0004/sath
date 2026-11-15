@@ -9,3 +9,5 @@ export * from "./components/MedicinesView.js";
 export * from "./components/AppointmentsView.js";
 export * from "./components/SettingsView.js";
 export * from "./components/ScanConfirmModal.js";
+export * from "./components/ReportLensModal.js";
+export * from "./components/ReportsView.js";

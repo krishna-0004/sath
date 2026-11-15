@@ -1,6 +1,6 @@
 import React from "react";
 
-export type CareTab = "today" | "family" | "medicines" | "appointments" | "settings";
+export type CareTab = "today" | "family" | "medicines" | "reports" | "appointments" | "settings";
 
 export interface CareNavigationProps {
   activeTab: CareTab;
@@ -37,6 +37,12 @@ export function CareNavigation({
       label: "Medicines",
       icon: "💊",
       visible: isElder || sharing.medicines,
+    },
+    {
+      id: "reports",
+      label: "Lab Reports",
+      icon: "🔬",
+      visible: isElder || sharing.reports,
     },
     {
       id: "appointments",

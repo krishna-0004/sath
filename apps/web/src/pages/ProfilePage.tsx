@@ -11,6 +11,7 @@ import {
   type CareTab,
   FamilyDashboardView,
   MedicinesView,
+  ReportsView,
   SettingsView,
   TodayView,
   useProfile,
@@ -115,6 +116,9 @@ export function ProfilePage(): React.JSX.Element {
           {activeTab === "today" && <TodayView profile={profile} canEdit={canEdit} />}
           {activeTab === "family" && <FamilyDashboardView profile={profile} isElder={isElder} />}
           {activeTab === "medicines" && <MedicinesView profile={profile} canEdit={canEdit} />}
+          {activeTab === "reports" && (
+            <ReportsView profile={profile} canEdit={canEdit} isElder={isElder} />
+          )}
           {activeTab === "appointments" && <AppointmentsView profile={profile} canEdit={canEdit} />}
           {activeTab === "settings" && <SettingsView profile={profile} isElder={isElder} />}
         </div>

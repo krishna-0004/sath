@@ -1,17 +1,24 @@
 import { apiRequest } from "../../lib/api-client.js";
 import type {
   Appointment,
+  CreateReportPayload,
   DoctorContact,
   DoctorContactKind,
   DoseEvent,
   DoseStatus,
   DoseSummary,
   Medicine,
+  MetricComparisonResponse,
+  PrescriptionConfirmPayload,
+  PrescriptionConfirmResponse,
+  PrescriptionPreviewResponse,
   Profile,
   ProfileMemberItem,
   ProfileMembership,
   ProfileRole,
   ProfileSummaryItem,
+  Report,
+  ReportPreviewResponse,
 } from "./types.js";
 
 export const careApi = {
@@ -269,8 +276,8 @@ export const careApi = {
   async previewPrescription(
     profileId: string,
     uploadId: string,
-  ): Promise<import("./types.js").PrescriptionPreviewResponse> {
-    return apiRequest<import("./types.js").PrescriptionPreviewResponse>(
+  ): Promise<PrescriptionPreviewResponse> {
+    return apiRequest<PrescriptionPreviewResponse>(
       `/profiles/${profileId}/scan/prescription/preview`,
       {
         method: "POST",
@@ -281,14 +288,52 @@ export const careApi = {
 
   async confirmPrescription(
     profileId: string,
-    payload: import("./types.js").PrescriptionConfirmPayload,
-  ): Promise<import("./types.js").PrescriptionConfirmResponse> {
-    return apiRequest<import("./types.js").PrescriptionConfirmResponse>(
+    payload: PrescriptionConfirmPayload,
+  ): Promise<PrescriptionConfirmResponse> {
+    return apiRequest<PrescriptionConfirmResponse>(
       `/profiles/${profileId}/scan/prescription/confirm`,
       {
         method: "POST",
         body: payload as unknown as Record<string, unknown>,
       },
+    );
+  },
+
+  // Report Lens & What Changed Feed
+  async previewReport(profileId: string, uploadId: string): Promise<ReportPreviewResponse> {
+    return apiRequest<ReportPreviewResponse>(`/profiles/${profileId}/reports/preview`, {
+      method: "POST",
+      body: { uploadId },
+    });
+  },
+
+  async createReport(profileId: string, payload: CreateReportPayload): Promise<{ report: Report }> {
+    return apiRequest<{ report: Report }>(`/profiles/${profileId}/reports`, {
+      method: "POST",
+      body: payload as unknown as Record<string, unknown>,
+    });
+  },
+
+  async getReports(profileId: string): Promise<{ reports: Report[] }> {
+    return apiRequest<{ reports: Report[] }>(`/profiles/${profileId}/reports`);
+  },
+
+  async getReportById(profileId: string, reportId: string): Promise<{ report: Report }> {
+    return apiRequest<{ report: Report }>(`/profiles/${profileId}/reports/${reportId}`);
+  },
+
+  async deleteReport(profileId: string, reportId: string): Promise<void> {
+    return apiRequest<void>(`/profiles/${profileId}/reports/${reportId}`, {
+      method: "DELETE",
+    });
+  },
+
+  async compareReportMetric(
+    profileId: string,
+    metricName: string,
+  ): Promise<MetricComparisonResponse> {
+    return apiRequest<MetricComparisonResponse>(
+      `/profiles/${profileId}/reports/compare?metricName=${encodeURIComponent(metricName)}`,
     );
   },
 };

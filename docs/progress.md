@@ -116,3 +116,13 @@ This log tracks verification protocol execution step-by-step.
 
 - Status: PASS
 - Evidence: `apps/ai` pytest: 23 passed (86.54% coverage), ruff & mypy clean. `apps/api` vitest: 8 passed (upload validation, mime/size limits, private authenticated url, mock asset serving, AI 503 retry). Committed (`594317a`).
+
+## Phase 2–5 — Step 6: Scan & Confirm flow: medicines and deterministic diff (api + web)
+
+- Status: PASS
+- Evidence: `apps/api` vitest: 3 passed (deterministic diff calculation, added, updated, unchanged, possiblyDiscontinued, DB unmutated on preview, confirm applies mutations with audit trail). `apps/web` vitest: 3 passed (upload screen, file validation, analyzing status announcer, 4-section diff review, >= 76px elder confirm, axe clean). Committed (`2d93ef5`).
+
+## Phase 2–5 — Step 7: Report Lens & What Changed feed (api + web)
+
+- Status: PASS
+- Evidence: `apps/api` vitest: 6 passed (lab report extraction preview, confirm report, list reports, category sharing 404 enforcement, single report retrieval, deterministic comparison with strictly neutral diff text, elder-only deletion). `apps/web` vitest: 3 passed (upload dropzone, review table, Rule 9 neutral advisory verification, What Changed trend comparison, axe clean). Typecheck & lint clean.

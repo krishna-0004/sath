@@ -29,6 +29,7 @@ export interface UpdateMedicineDto {
   withFood?: WithFoodTiming;
   notes?: string;
   status?: MedicineStatus;
+  source?: MedicineSource;
   updatedBy: string;
 }
 
